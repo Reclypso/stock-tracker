@@ -1,3 +1,209 @@
 {
-  "picks": []
+  "picks": [
+    {
+      "id": "2026-11-09-IONQ",
+      "ticker": "IONQ",
+      "company": "IonQ",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-09T21:35:04.611Z",
+      "priceAtCall": 35.34,
+      "thesis": "Biggest pure-play quantum name just posted a record beat-and-raise; post-earnings gap is holding and the stock is still half its 6-month high, so the drift can carry it back toward $50-72.",
+      "catalyst": "Q3 beat-and-raise (Nov 5): revenue $173.8M (+336% y/y), FY26 guide raised to $505-515M, backlog $1.2B. Follow-through: Rigetti/D-Wave prints Nov 10 can extend the sector move.",
+      "grade": "B",
+      "stop": 31.5,
+      "target": 50,
+      "targetBase": 50,
+      "targetBull": 72,
+      "timeframe": "3-6 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Record Q3 revenue $173.8M (+336% y/y), FY2026 guidance raised to $505-515M, backlog more than doubled to $1.2B",
+          "sources": [
+            {
+              "title": "IonQ Q3 2026 press release",
+              "url": "https://investors.ionq.com/news/news-details/2026/IonQ-Announces-Record-3Q26-Revenues-and-Raises-FY2026-Guidance-to-505---515-Million-as-Backlog-Grows-to-1-2-Billion/default.aspx"
+            }
+          ]
+        },
+        {
+          "text": "Stock gapped +23% on Nov 6 and added +8% on Nov 9; 2027 Superion capacity described as sold out. Risk: $83.5M of revenue came from the SkyWater acquisition and adj. EBITDA loss was $133.6M",
+          "sources": [
+            {
+              "title": "24/7 Wall St., Nov 9 2026",
+              "url": "https://247wallst.com/investing/2026/11/09/ionq-jumps-8-as-raised-revenue-outlook-extends-quantum-rally-rigetti-surges-8-d-wave-rises-6/"
+            }
+          ]
+        },
+        {
+          "text": "Management commentary on demand and the $2B equity raise (cash to keep investing)",
+          "sources": [
+            {
+              "title": "IonQ Q3 2026 earnings call transcript",
+              "url": "https://www.fool.com/earnings/call-transcripts/2026/11/06/ionq-ionq-q3-2026-earnings-call-transcript/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-IREN",
+      "ticker": "IREN",
+      "company": "IREN Ltd",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-09T21:35:04.663Z",
+      "priceAtCall": 21.41,
+      "thesis": "AI-cloud operator crushed 65% in a year on financing fears, but revenue is ramping fast and >$4B of contracted, funded ARR goes live Jan-Feb 2027; a relief re-rating toward analyst targets ($30-65) could double it.",
+      "catalyst": "Microsoft Horizon 2-4 capacity (>$4B contracted ARR) targeted to go live by Jan 31, 2027 (may slip to Feb). Next earnings ~early Feb 2027.",
+      "grade": "C",
+      "stop": 17,
+      "target": 35,
+      "targetBase": 35,
+      "targetBull": 55,
+      "timeframe": "3-6 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q1 FY27 revenue $228M (+66% q/q), AI Cloud revenue $200M (+182% q/q) at 86% gross margin, backlog $20.3B, new contracts signed after quarter end",
+          "sources": [
+            {
+              "title": "CNBC, Nov 5 2026",
+              "url": "https://www.cnbc.com/2026/11/05/iren-earnings-report-q1-2027-.html"
+            }
+          ]
+        },
+        {
+          "text": "Analysts cut targets on the delay but still see big upside: Cantor $47 (Overweight), Macquarie $55, BTIG $65, Goldman $30 (Neutral)",
+          "sources": [
+            {
+              "title": "Yahoo Finance, Nov 9 2026",
+              "url": "https://finance.yahoo.com/markets/stocks/articles/cantor-cuts-iren-price-target-150136747.html"
+            }
+          ]
+        },
+        {
+          "text": "Main risk: heavy debt (~$10B) and $6B of FY27 capex financing still 'targeted', not committed; stock is in a Stage 4 downtrend, so this is a speculative rebound",
+          "sources": [
+            {
+              "title": "IREN Q1 FY27 results",
+              "url": "https://iren.gcs-web.com/news-releases/news-release-details/iren-reports-q1-fy27-results"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-SERV",
+      "ticker": "SERV",
+      "company": "Serve Robotics",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-09T21:35:04.713Z",
+      "priceAtCall": 3.39,
+      "thesis": "Small robotics name (~$300M cap, ~$198M cash) gapped +39% on a guidance raise and held it; AI/robotics heat plus a new Physical AI Services revenue line could re-rate it toward its $9 high.",
+      "catalyst": "Q3 beat and FY26 revenue guide raised to $12M (Nov 5), Physical AI Services launch, Australia expansion; Q4 delivery-volume updates and new partner announcements.",
+      "grade": "C",
+      "stop": 2.95,
+      "target": 5.5,
+      "targetBase": 5.5,
+      "targetBull": 9,
+      "timeframe": "3-6 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 revenue $2.8M (+313% y/y), FY26 guide raised to $12M from $9-10M, opex guide cut to $150M, $198M cash and securities",
+          "sources": [
+            {
+              "title": "Serve Robotics Q3 2026 release",
+              "url": "https://investors.serverobotics.com/news-releases/news-release-details/serve-robotics-announces-third-quarter-2026-results"
+            }
+          ]
+        },
+        {
+          "text": "New Physical AI Services line opens its fleet data/tech to other robot makers",
+          "sources": [
+            {
+              "title": "Serve Robotics press release, Nov 5 2026",
+              "url": "https://investors.serverobotics.com/news-releases/news-release-details/serve-robotics-launches-physical-ai-services-opening-technology"
+            }
+          ]
+        },
+        {
+          "text": "Stock jumped ~39% on Nov 6 and held the gap Nov 9. Main risk: burns ~$40M/quarter and uses ATM offerings (dilution)",
+          "sources": [
+            {
+              "title": "Zintick, Nov 6 2026",
+              "url": "https://zintick.com/news/serve-robotics-serv-stock-up-q3-results-and-raised-guidance-2026-11-06"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-CAPR",
+      "ticker": "CAPR",
+      "company": "Capricor Therapeutics",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-09T21:35:04.759Z",
+      "priceAtCall": 9.85,
+      "thesis": "Binary FDA bet: deramiocel for Duchenne decides Nov 22; approval (plus a possible priority review voucher) could send a stock that was $31.90 this year back to $18-30. A rejection likely cuts it in half or worse.",
+      "catalyst": "FDA PDUFA date Nov 22, 2026 for deramiocel (DMD, upper-limb function label). Q3 results due Nov 10.",
+      "grade": "Lottery",
+      "stop": 7.9,
+      "target": 18,
+      "targetBase": 18,
+      "targetBull": 30,
+      "timeframe": "1-3 months (FDA decision Nov 22)",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "FDA decision on deramiocel scheduled for Nov 22 after a 3-month extension for new 24-month HOPE-3 data and a narrower upper-limb label",
+          "sources": [
+            {
+              "title": "BioSpace, Nov 6 2026",
+              "url": "https://www.biospace.com/fda/verdicts-for-summit-akeso-capricor-vertex-mark-fdas-stacked-november"
+            }
+          ]
+        },
+        {
+          "text": "HOPE-3 cardiac data won an AHA research award (Nov 7); 28 trial physician-scientists wrote FDA urging approval; stock +35% in 5 days",
+          "sources": [
+            {
+              "title": "Yahoo Finance, Nov 9 2026",
+              "url": "https://finance.yahoo.com/healthcare/articles/capr-stock-rises-deramiocel-cardiac-201251014.html"
+            }
+          ]
+        },
+        {
+          "text": "Main risk: FDA advisers voted 9-3 against efficacy (cardiac) in July and the first application was rejected in 2025; a no would gap through the stop. Cash ~$238M (Jun 30)",
+          "sources": [
+            {
+              "title": "Merlin Trader, CAPR into Nov 22",
+              "url": "https://merlintrader.beehiiv.com/p/capricor-heads-into-its-november-22-fda-date-for-deramiocel"
+            }
+          ]
+        },
+        {
+          "text": "Date confirmed on the PDUFA calendar",
+          "sources": [
+            {
+              "title": "pdufa.bio November 2026 calendar",
+              "url": "https://www.pdufa.bio/calendar/2026/november"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
