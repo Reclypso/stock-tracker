@@ -1,4 +1,29 @@
 {
-  "prices": {},
-  "updated": null
+  "prices": {
+    "CAPR": {
+      "changePct": 9.23,
+      "prevClose": 9.0176,
+      "price": 9.85,
+      "time": "2026-11-09T21:35:32Z"
+    },
+    "IONQ": {
+      "changePct": 10.09,
+      "prevClose": 32.1,
+      "price": 35.34,
+      "time": "2026-11-09T21:35:32Z"
+    },
+    "IREN": {
+      "changePct": -1.52,
+      "prevClose": 21.74,
+      "price": 21.41,
+      "time": "2026-11-09T21:35:32Z"
+    },
+    "SERV": {
+      "changePct": 5.94,
+      "prevClose": 3.2,
+      "price": 3.39,
+      "time": "2026-11-09T21:35:32Z"
+    }
+  },
+  "updated": "2026-11-09T21:35:32Z"
 }
