@@ -47,7 +47,10 @@
             }
           ]
         }
-      ]
+      ],
+      "baseTimeframe": "2-4 months",
+      "bullTimeframe": "4-8 months",
+      "bullCase": "If IonQ announces a new large system or government deal, or its Q4 report (late Feb 2027) beats the raised $505-515M guide and gives a 2027 outlook well above consensus while the quantum theme stays hot."
     },
     {
       "id": "2026-11-09-IREN",
@@ -96,7 +99,10 @@
             }
           ]
         }
-      ]
+      ],
+      "baseTimeframe": "3-4 months (after the Jan 2027 go-live)",
+      "bullTimeframe": "6-9 months",
+      "bullCase": "If Microsoft Horizon 2-4 capacity goes live on schedule by Jan 31, 2027 AND the remaining ~$6B of targeted capex financing gets committed (or IREN signs another hyperscaler/frontier-lab contract)."
     },
     {
       "id": "2026-11-09-SERV",
@@ -145,7 +151,10 @@
             }
           ]
         }
-      ]
+      ],
+      "baseTimeframe": "2-4 months",
+      "bullTimeframe": "6-12 months",
+      "bullCase": "If Serve signs a major new delivery-platform or robot-maker customer for Physical AI Services (or a large hospital-robot deal) and its 2027 guidance shows revenue scaling well past the $12M 2026 level."
     },
     {
       "id": "2026-11-09-CAPR",
@@ -203,7 +212,10 @@
             }
           ]
         }
-      ]
+      ],
+      "baseTimeframe": "1-2 weeks after a Nov 22 approval",
+      "bullTimeframe": "1-3 months",
+      "bullCase": "If the FDA approves deramiocel on Nov 22 with a usable label and grants the rare pediatric priority review voucher (sellable for cash), and the NS Pharma distribution dispute gets resolved."
     }
   ]
 }
