@@ -1,35 +1,3 @@
 {
-  "picks": [
-    {
-      "id": "2026-11-08-ZZTEST",
-      "ticker": "ZZTEST",
-      "company": "Test Co",
-      "dateCalled": "2026-11-08",
-      "calledAt": "2026-11-09T07:43:30.400Z",
-      "priceAtCall": 10,
-      "thesis": "live test",
-      "catalyst": "none",
-      "grade": "C",
-      "stop": 8,
-      "target": 20,
-      "targetBase": 20,
-      "targetBull": 50,
-      "timeframe": "3 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "",
-      "reasons": [
-        {
-          "text": "Test reason",
-          "sources": [
-            {
-              "title": "Example",
-              "url": "https://example.com/"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  "picks": []
 }
