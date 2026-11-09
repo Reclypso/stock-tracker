@@ -173,6 +173,10 @@ http://localhost:8000/?demo=1
 
 Enable GitHub Pages on the `main` branch, root (`/`), for the live URL above. Push an initial commit yourself before using the CLI without `--no-push`. The price workflow needs that branch on the remote.
 
+## Design
+
+Dark HUD theme in plain HTML/CSS/JS, no build step and no animation library (Web Animations API + CSS). Numbers count up and progress bars fill on first load. After that, only values that change during polling animate: green flash up, red flash down, and new picks slide in. `prefers-reduced-motion` turns the movement off. Inter loads from Google Fonts if available; otherwise the system font stack is used. For local testing, `?demo=1&fast=1` on localhost polls every 5s instead of 60s.
+
 ## Disclaimer
 
 Not financial advice. Ideas can go to zero.
