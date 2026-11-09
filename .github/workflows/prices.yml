@@ -1,0 +1,59 @@
+name: Update prices
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every 15 minutes, weekdays, 13:00–21:45 UTC.
+    # Covers US cash session in both EST (14:30–21:00 UTC) and EDT (13:30–21:00 UTC).
+    - cron: "*/15 13-21 * * 1-5"
+  push:
+    branches:
+      - main
+    paths:
+      - "data/picks.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-prices
+  cancel-in-progress: false
+
+jobs:
+  prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Fetch prices
+        run: python scripts/fetch_prices.py
+
+      - name: Commit and push if prices changed
+        run: |
+          if git diff --quiet -- data/prices.json; then
+            echo "No price changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- data/prices.json
+          git commit -m "Update prices [skip ci]"
+          # Schedule and dispatch checkouts are often detached, so pull and
+          # push name origin/main explicitly. Retry the push once.
+          git pull --rebase origin main
+          if ! git push origin HEAD:main; then
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
