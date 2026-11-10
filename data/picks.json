@@ -278,6 +278,427 @@
       "bullTimeframe": "1-3 months",
       "bullCase": "If the company actually starts buying back stock, River One closes in Q4 and tokenized-asset growth or new big-manager products (BlackRock/ARK-type) keep coming, re-rating it back to the $12-13.5 range it traded in through October.",
       "horizon": "swing"
+    },
+    {
+      "id": "2026-11-09-AAON",
+      "ticker": "AAON",
+      "company": "AAON (The Aaon Group)",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:14:32.058Z",
+      "priceAtCall": 73.85,
+      "thesis": "Medium-term: HVAC and data-center cooling maker (BASX brand) that fell from ~$150 to ~$63 this year, then posted a blowout Q3 after the close Nov 9: sales +84% to a record $707M vs ~$600M expected, EPS $0.83 vs $0.57, backlog $1.9B (+40%), and full-year sales guidance raised to $2.48-2.52B. Up ~17% after hours to ~$73.85. A mid-cap beat-and-raise this big off a beaten-down base is a classic post-earnings drift setup over the next 1-3 months.",
+      "catalyst": "Q3 beat-and-raise Nov 9 after close; next-open reaction Tue Nov 10; Baird Global Industrial conference; continued BASX data-center orders.",
+      "grade": "B",
+      "stop": 66,
+      "target": 90,
+      "targetBase": 90,
+      "targetBull": 110,
+      "timeframe": "1-3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Entry is the after-hours price (~$73.85, close was $62.87); don't chase a big open above ~$78, prefer the first pullback that holds the gap. Stop $66 = gives back over half the gap. Grade B, not A: it also restated Q1-Q2 and disclosed a material weakness (restatement raised first-half results by $10.7M). Still a downtrend on the weekly chart.",
+      "reasons": [
+        {
+          "text": "Record Q3: net sales +84% to $707.4M, operating income +129%, backlog $1.9B (+40.5%), 2026 outlook raised to 72-75% sales growth",
+          "sources": [
+            {
+              "title": "AAON Q3 2026 release (PR Newswire)",
+              "url": "https://www.prnewswire.com/news-releases/the-aaon-group-reports-record-third-quarter-2026-results-restates-first-and-second-quarter-2026-financial-statements-and-raises-full-year-outlook-302933844.html"
+            }
+          ]
+        },
+        {
+          "text": "Beat: adj EPS $0.83 vs $0.57 est, sales $707M vs $600M est; FY26 sales guide raised to $2.48-2.52B vs $2.30B est",
+          "sources": [
+            {
+              "title": "Benzinga: AAON raises FY2026 sales guidance",
+              "url": "https://www.benzinga.com/news/26/11/63068426/aaon-raises-fy2026-sales-guidance-2-235b-2-307b-2-480b-2-524b-vs-2-301b-est"
+            }
+          ]
+        },
+        {
+          "text": "Primary filing: 8-K items 2.02 and 4.02 (non-reliance on Q1-Q2 statements) filed Nov 9",
+          "sources": [
+            {
+              "title": "SEC 8-K (AAON)",
+              "url": "https://www.sec.gov/Archives/edgar/data/824142/000082414226000083/aaon-20261109.htm"
+            }
+          ]
+        },
+        {
+          "text": "Risk: material weakness and restated Q1-Q2; stock was down ~58% from its June high before this report; rate hikes pressure building spending",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "4-8 weeks",
+      "bullTimeframe": "2-3 months",
+      "bullCase": "the gap holds, BASX keeps landing hyperscaler data-center orders and the restatement stays contained",
+      "horizon": "swing"
+    },
+    {
+      "id": "2026-11-09-VIR",
+      "ticker": "VIR",
+      "company": "Vir Biotechnology",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:14:32.118Z",
+      "priceAtCall": 13.65,
+      "thesis": "Medium-term: Vir's two-drug hepatitis delta regimen (monthly shots) hit its Phase 3 ECLIPSE 1 goals on Nov 8: 44% reached undetectable virus plus normal liver enzymes vs 0% on delayed treatment, 79% undetectable virus, clean safety. The stock rose only ~12% to a new 52-week high of $13.65 on 3.7x volume. Hepatitis delta is the most severe form of viral hepatitis with few treatment options; ECLIPSE 2/3 data come in Q1 2027 and an FDA filing is planned for mid-2027. ~$900M cash vs ~$2.3B market cap.",
+      "catalyst": "ECLIPSE 1 Phase 3 win (AASLD, Nov 8); ECLIPSE 2 and 3 topline Q1 2027; US filing mid-2027; masked T-cell engager deals with Astellas and Gilead.",
+      "grade": "B",
+      "stop": 12.2,
+      "target": 17,
+      "targetBase": 17,
+      "targetBull": 22,
+      "timeframe": "1-4 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Stop $12.20 = back under Friday's close (gap fill). Analyst targets: HC Wainwright $22, Needham $20. Cash runway 12+ months per the 10-Q, so no forced raise near term, but biotech can sell into strength.",
+      "reasons": [
+        {
+          "text": "Phase 3 ECLIPSE 1 met primary and key secondary endpoints: 44.1% HDV RNA undetectable + ALT normal vs 0%; 79.2% undetectable at week 48; no discontinuations",
+          "sources": [
+            {
+              "title": "Benzinga: Vir ECLIPSE 1 meets primary endpoint",
+              "url": "https://www.benzinga.com/news/26/11/63022869/reported-sunday-vir-s-elebsiran-and-tobevibart-meet-primary-endpoint-phase-3-eclipse-1-hepatitis-del"
+            }
+          ]
+        },
+        {
+          "text": "Primary filing: 8-K items 7.01/8.01 with the ECLIPSE 1 data (Nov 9)",
+          "sources": [
+            {
+              "title": "SEC 8-K (Vir)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1706431/000162828026071908/vir-20261108.htm"
+            }
+          ]
+        },
+        {
+          "text": "ECLIPSE 2/3 data expected Q1 2027, US filing mid-2027; shares up ~15% to a 52-week high on the news",
+          "sources": [
+            {
+              "title": "Benzinga: Vir highlights viral suppression in advanced liver disease",
+              "url": "https://www.benzinga.com/trading-ideas/movers/26/11/63039953/vir-biotech-highlights-significant-viral-suppression-in-advanced-liver-disease-study"
+            }
+          ]
+        },
+        {
+          "text": "About $901M cash and investments at Sept 30, 2026 (runway 12+ months per 10-Q); HC Wainwright Buy, $22 target",
+          "sources": [
+            {
+              "title": "HC Wainwright reiterates Buy, $22 PT",
+              "url": "https://www.benzinga.com/news/26/11/63049718/hc-wainwright-co-reiterates-buy-vir-biotechnology-maintains-22-price-target"
+            }
+          ]
+        },
+        {
+          "text": "Risk: still loss-making; Gilead's bulevirtide and other hep-delta drugs compete; a 44% combined response may be judged modest; ECLIPSE 2/3 could disappoint",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "4-10 weeks",
+      "bullTimeframe": "2-4 months",
+      "bullCase": "ECLIPSE 2/3 read out positive in Q1 2027 and the market starts pricing a first US hep-delta approval",
+      "horizon": "swing"
+    },
+    {
+      "id": "2026-11-09-XE",
+      "ticker": "XE",
+      "company": "X-Energy",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:14:54.349Z",
+      "priceAtCall": 11.24,
+      "thesis": "Long-term: small modular nuclear reactor developer (Xe-100 reactor, TRISO-X fuel; backed by Amazon and Dow). IPO'd at $23 in April, peaked at $37, then fell ~70% to ~$11 as the nuclear theme cooled and the 180-day lockup ended Oct 21. The business keeps hitting milestones: NRC finished its Xe-100 safety review Oct 30, and on Nov 9 the NRC approved the construction permit for Dow's Long Mott plant in Texas, the first advanced nuclear plant approved for an industrial site. ~$1.1B cash after the IPO. A re-rating back toward the IPO price would double it.",
+      "catalyst": "NRC construction permit for Long Mott (Nov 9); Q3 results Nov 12 before the open; Amazon-backed Cascade project (Fluor hired Nov 5); Dow preliminary investment decision in 2027.",
+      "grade": "C",
+      "stop": 8.6,
+      "target": 17,
+      "targetBase": 17,
+      "targetBull": 23,
+      "timeframe": "3-12 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Grade C: Stage 4 downtrend (below falling 50- and 200-day), big cash burn (H1 net loss $272M incl. non-cash), rate-hike headwind for long-dated stories. Stop $8.60 = under the Nov 5 low ($8.68). Earnings Nov 12 can swing it either way. Lockup selling overhang has passed.",
+      "reasons": [
+        {
+          "text": "NRC approved the construction permit for Dow/X-energy's Long Mott station, the first advanced nuclear facility approved for a U.S. industrial site",
+          "sources": [
+            {
+              "title": "X-energy/Dow release (GlobeNewswire)",
+              "url": "https://www.globenewswire.com/news-release/2026/11/09/3399007/0/en/dow-x-energy-proposed-smr-project-receives-historic-construction-permit-for-nuclear-powered-industrial-site.html"
+            }
+          ]
+        },
+        {
+          "text": "NRC completed its Xe-100 safety review Oct 30; first steam generator tubing order placed Nov 4",
+          "sources": [
+            {
+              "title": "X-energy: NRC completes safety review",
+              "url": "https://www.globenewswire.com/news-release/2026/10/30/3392254/0/en/nrc-completes-landmark-safety-review-of-x-energy-s-xe-100-smr.html"
+            }
+          ]
+        },
+        {
+          "text": "IPO priced at $23 (Apr 23, 2026); 180-day lockup expired Oct 21; ~$1.15B cash at June 30 (10-Q)",
+          "sources": [
+            {
+              "title": "X-energy IPO pricing",
+              "url": "https://investors.x-energy.com/news-releases/news-release-details/x-energy-announces-pricing-upsized-initial-public-offering"
+            },
+            {
+              "title": "X-energy 10-Q (Q2 2026)",
+              "url": "https://www.sec.gov/Archives/edgar/data/2088896/000119312526347752/xe-20260630.htm"
+            }
+          ]
+        },
+        {
+          "text": "Wedbush started at Outperform with a $17 target (Nov 3); UBS Buy, $18 target",
+          "sources": [
+            {
+              "title": "Benzinga: Wedbush initiates X-Energy",
+              "url": "https://www.benzinga.com/news/26/11/62808409/wedbush-initiates-coverage-x-energy-outperform-rating-announces-price-target-17"
+            }
+          ]
+        },
+        {
+          "text": "Risk: pre-revenue-scale reactor builder; years before plants run; will likely need more capital; Dow decision not until 2027",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "3-6 months",
+      "bullTimeframe": "6-12 months",
+      "bullCase": "nuclear stocks come back into favor and X-energy lands a new hyperscaler or utility order (or Dow commits to Long Mott)",
+      "horizon": "swing"
+    },
+    {
+      "id": "2026-11-09-PYPD",
+      "ticker": "PYPD",
+      "company": "PolyPid",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:14:54.395Z",
+      "priceAtCall": 6.24,
+      "thesis": "Lottery: PolyPid's D-PLEX100 (an antibiotic implant that prevents infections after colorectal surgery; positive Phase 3 SHIELD II) has an FDA decision date of Nov 28, 2026, which the company reconfirmed Oct 28. Tiny company (~$127M market cap, ~7M-share float) with US rights partnered to Azurity ($30M upfront plus near-term milestones), and it says cash lasts into 2028, so no raise is forced before the decision. Approval could re-rate it toward Oppenheimer's $10 target; a rejection would likely cut it in half.",
+      "catalyst": "FDA PDUFA date Nov 28, 2026 for D-PLEX100; Q3 results Nov 11.",
+      "grade": "Lottery",
+      "stop": 5.3,
+      "target": 8.1,
+      "targetBase": 8.1,
+      "targetBull": 10,
+      "timeframe": "1 day to 2 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Lottery size only (max ~5%). It already ran to a 52-week high into the date, so sell-the-news is possible even on approval. Thin volume (~170k shares/day): use limit orders. A CRL means exit; the $5.30 stop won't protect against an overnight gap.",
+      "reasons": [
+        {
+          "text": "Company: D-PLEX100 on track for the November 28 PDUFA date (Oct 28 release)",
+          "sources": [
+            {
+              "title": "PolyPid pipeline update (GlobeNewswire)",
+              "url": "https://www.globenewswire.com/news-release/2026/10/28/3390139/0/en/polypid-unveils-expanded-pipeline-strategy-introducing-pd01b-a-new-kynatrix-based-product-candidate-for-the-treatment-of-diabetic-foot-infections.html"
+            }
+          ]
+        },
+        {
+          "text": "Cash $6.6M at June 30 plus $30M Azurity upfront and near-term milestones; company says this funds operations into 2028",
+          "sources": [
+            {
+              "title": "PolyPid Q2 2026 results (SEC 6-K)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1611842/000121390026088040/ea030152801ex99-1.htm"
+            }
+          ]
+        },
+        {
+          "text": "Oppenheimer initiated at Outperform, $10 target (Oct 27)",
+          "sources": [
+            {
+              "title": "Benzinga: Oppenheimer initiates PolyPid",
+              "url": "https://www.benzinga.com/news/26/10/62612868/oppenheimer-initiates-coverage-polypid-outperform-rating-announces-price-target-10"
+            }
+          ]
+        },
+        {
+          "text": "Risk: binary FDA decision; Israeli microcap; ended its European partner deal (ADVANZ) Oct 1; thin trading",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "by Nov 28 decision",
+      "bullTimeframe": "1-2 months",
+      "bullCase": "the FDA approves D-PLEX100 on time with a clean label and Azurity pays the approval milestone",
+      "horizon": "fast"
+    },
+    {
+      "id": "2026-11-09-SVRA",
+      "ticker": "SVRA",
+      "company": "Savara",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:15:25.001Z",
+      "priceAtCall": 5.05,
+      "thesis": "Lottery: Savara's MOLBREEVI (inhaled GM-CSF for autoimmune pulmonary alveolar proteinosis, a rare lung disease with no approved drug) has an FDA decision date of Nov 22, 2026. It has Priority Review, Breakthrough and Fast Track status and a positive Phase 3 (IMPALA-2); the date was pushed back 3 months in April after Savara's answers were deemed a major amendment. ~$1.0B market cap at $5.05 with ~$129M cash plus up to $75M of extra Hercules loans that unlock on approval. JP Morgan's target is $12.",
+      "catalyst": "FDA PDUFA date Nov 22, 2026 (a Sunday, so a decision may come Fri Nov 20 or earlier); UK MHRA decision expected Q4 2026; EU decision Q1 2027.",
+      "grade": "Lottery",
+      "stop": 4.3,
+      "target": 6.6,
+      "targetBase": 6.6,
+      "targetBull": 8.5,
+      "timeframe": "1 day to 3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Lottery size only. Approval odds look decent (positive Phase 3, Priority Review) but an extension or CRL would likely drop it 40%+ overnight, past the $4.30 stop (under the Nov 5 low). Liquid: ~2.4M shares/day.",
+      "reasons": [
+        {
+          "text": "10-Q: BLA filed with Priority Review; review extended for a major amendment, new PDUFA target action date Nov 22, 2026; ~$129M cash and investments at Sept 30, runway 12+ months",
+          "sources": [
+            {
+              "title": "Savara 10-Q (Q3 2026)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1160308/000119312526453535/svra-20260930.htm"
+            }
+          ]
+        },
+        {
+          "text": "JP Morgan initiated at Overweight with a $12 target (Oct 7)",
+          "sources": [
+            {
+              "title": "Benzinga: JP Morgan initiates Savara",
+              "url": "https://www.benzinga.com/news/26/10/62225913/jp-morgan-initiates-coverage-savara-overweight-rating-announces-price-target-12"
+            }
+          ]
+        },
+        {
+          "text": "EU/UK applications under review (UK decision expected Q4 2026, EU Q1 2027); patents to 2041",
+          "sources": [
+            {
+              "title": "Benzinga: Savara MAA update",
+              "url": "https://www.benzinga.com/news/26/08/61129414/savara-says-molbreevi-maas-under-review-ema-and-u-k-s-mhra-decisions-expected-q1-2027-and-q4-2026-re"
+            }
+          ]
+        },
+        {
+          "text": "Risk: the FDA already extended once; small launch market (rare disease); Hercules debt; possible equity raise after approval",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "by Nov 22 decision",
+      "bullTimeframe": "1-3 months",
+      "bullCase": "the FDA approves on time with a broad label and the UK approval follows in Q4",
+      "horizon": "fast"
+    },
+    {
+      "id": "2026-11-09-GDX",
+      "ticker": "GDX",
+      "company": "VanEck Gold Miners ETF",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:15:25.049Z",
+      "priceAtCall": 91.46,
+      "thesis": "Macro (long-term): gold miners as a long-term hold on central-bank gold buying. Official buyers added 321 tonnes in Q3 (+42% y/y, the most since Q4 2024), yet gold (~$4,130) is still ~26% below its January record and GDX is ~22% under its March high. Miners earn huge margins at these prices (Barrick's Q3 adj EPS +41% y/y), and miners move about 2-3x gold. GDX just reclaimed its 50- and 200-day averages (+15% in a week). Short-term chance: a pullback after Tuesday's CPI is a better add point.",
+      "catalyst": "Q3 central-bank buying (WGC); October CPI Tue Nov 10; Fed meeting Dec 8-9 (~80% odds of a hike); Iran war/peace headlines; miner Q3 earnings this week.",
+      "grade": "B",
+      "stop": 82,
+      "target": 110,
+      "targetBase": 110,
+      "targetBull": 125,
+      "timeframe": "3-12 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Plain 1x ETF, no decay, fine to hold for months. Stop $82 is ~10% down (under last week's lows, back below the 50/200-day). Headwinds: Fed still hiking and 10-year ~4.9%; a peace deal can cut the safe-haven bid. If you want a short-term amplified version, NUGT/JNUG are 2x-3x but only for days, not months.",
+      "reasons": [
+        {
+          "text": "Central banks added 321t in Q3 (+42% y/y), 675t in 9 months (+6%); China and Poland led disclosed buying",
+          "sources": [
+            {
+              "title": "Kitco/Heraeus: gold, silver extend rebound; central banks on pace",
+              "url": "https://www.kitco.com/news/article/2026-11-09/gold-and-silver-prices-extend-post-election-rebound-central-banks-pace-beat"
+            }
+          ]
+        },
+        {
+          "text": "Gold ~$4,126-4,140 on Nov 9, ~26% below January's record; GDX +3.8% Monday vs gold +1.3%; Barrick Q3 adj EPS $0.82 (+41% y/y)",
+          "sources": [
+            {
+              "title": "TradingNews: gold clears $4,100",
+              "url": "https://www.tradingnews.com/news/gold-4216-usd-rallies-through-rising-yeilds-on-oil-collapse-4300-usd"
+            }
+          ]
+        },
+        {
+          "text": "Weaker dollar and falling oil supported metals; but futures price ~82% odds of a December hike",
+          "sources": [
+            {
+              "title": "Kitco PM report Nov 9",
+              "url": "https://www.kitco.com/news/article/2026-11-09/gold-silver-advance-dollar-weakens-fed-rate-expectations-face-inflation"
+            }
+          ]
+        },
+        {
+          "text": "Risk: rate hikes and a strong dollar; miners can fall 30%+ in a gold correction (GDX hit $69.74 in July)",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "3-6 months",
+      "bullTimeframe": "6-12 months",
+      "bullCase": "gold breaks back above $5,000 toward its January record as central banks keep buying and the Fed stops hiking",
+      "horizon": "swing"
+    },
+    {
+      "id": "2026-11-09-URNM",
+      "ticker": "URNM",
+      "company": "Sprott Uranium Miners ETF",
+      "dateCalled": "2026-11-09",
+      "calledAt": "2026-11-10T04:15:25.095Z",
+      "priceAtCall": 43.9,
+      "thesis": "Macro (long-term): uranium miners are down ~48% from January while the uranium contract price hit a record. Long-term contract price ~$97-99/lb (TradeTech/UxC, Oct 31), the highest since the 2000s, with spot ~$92. Utilities still have to sign years of supply and new mines are hard to finance, so miners that haven't sold their 2030s output should re-rate when the theme turns. URNM holds the miners plus Sprott's physical uranium trust. This is a buy-the-gap between the stocks and the commodity, not a momentum trade.",
+      "catalyst": "Record long-term uranium price (Oct 31); NRC approvals for new reactors (X-energy Long Mott, Nov 9); utility contracting; Cameco/Kazatomprom supply updates.",
+      "grade": "C",
+      "stop": 38.5,
+      "target": 55,
+      "targetBase": 55,
+      "targetBull": 70,
+      "timeframe": "3-12 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Grade C: still a Stage 4 downtrend (below falling 50-day $47.8 and 200-day $58). A safer add is a close back above the 50-day. Stop $38.50 = under the Nov 5 low ($39.07). The nuclear theme sold off after the midterms; this needs patience.",
+      "reasons": [
+        {
+          "text": "Long-term uranium price reached a record US$97/lb at Oct 31 (UxC), up ~13% this year; spot $92.65",
+          "sources": [
+            {
+              "title": "Purepoint monthly uranium update (UxC prices)",
+              "url": "https://purepoint.ca/wp-content/uploads/2026/11/PTU_Newsletter_2026_11.pdf"
+            }
+          ]
+        },
+        {
+          "text": "Spot below its January peak while the long-term indicator kept rising; Cameco says LT price is near its highest since 2011 in real terms",
+          "sources": [
+            {
+              "title": "Oregon Group: uranium's sell-off hides a tightening supply outlook",
+              "url": "https://theoregongroup.com/latest-news/uranium-sell-off-hides-tightening-supply-outlook/"
+            }
+          ]
+        },
+        {
+          "text": "Record term prices mark a new phase; spot cycle peak was $107, all-time high $136",
+          "sources": [
+            {
+              "title": "Sprott: Record term prices mark a new phase for uranium",
+              "url": "https://sprott.com/insights/record-term-prices-mark-a-new-phase-for-uranium/"
+            }
+          ]
+        },
+        {
+          "text": "Risk: miners have lagged the commodity for months; risk-off selling and policy changes after the midterms hit nuclear names; Sprott trust hasn't bought uranium since July",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "3-6 months",
+      "bullTimeframe": "6-12 months",
+      "bullCase": "spot uranium breaks above $100/lb and utilities speed up long-term contracting, pulling miners back toward their January highs",
+      "horizon": "swing"
     }
   ]
 }
