@@ -18,6 +18,18 @@
       "price": 21.41,
       "time": "2026-11-09T21:35:32Z"
     },
+    "QMCO": {
+      "changePct": 17.17,
+      "prevClose": 14.5,
+      "price": 16.99,
+      "time": "2026-11-10T02:55:07Z"
+    },
+    "SECZ": {
+      "changePct": -0.0,
+      "prevClose": 6.97,
+      "price": 6.97,
+      "time": "2026-11-10T02:55:07Z"
+    },
     "SERV": {
       "changePct": 5.94,
       "prevClose": 3.2,
@@ -25,5 +37,5 @@
       "time": "2026-11-09T21:35:32Z"
     }
   },
-  "updated": "2026-11-09T21:35:32Z"
+  "updated": "2026-11-10T02:55:07Z"
 }
