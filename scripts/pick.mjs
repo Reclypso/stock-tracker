@@ -502,6 +502,8 @@ function main() {
     const draft = buildAdd(flags, reasons);
     syncBeforeEdit(noPush);
     const doc = readDoc();
+    // Re-adding a ticker that lives in data/stopped.json is allowed — a new
+    // solid setup can return to the feed. Ids are unique only among open/archived picks.
     draft.id = makeId(draft.dateCalled, draft.ticker, doc.picks);
     doc.picks.push(draft);
     writeDoc(doc);

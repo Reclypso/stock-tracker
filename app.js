@@ -1,9 +1,10 @@
 // Stock Bot leads feed.
-// Polls picks and prices every 60s. On *.github.io, fetch raw.githubusercontent.com
-// first so the GitHub Pages CDN cannot serve a stale copy. Sort survives those
-// refreshes (and reloads, via localStorage). Renders are keyed DOM patches, so a
-// poll only animates what changed: open "why" sections, focus, scroll and
-// running animations are left alone.
+// Polls picks, prices and stopped-out leads every 60s. On *.github.io, fetch
+// raw.githubusercontent.com first so the GitHub Pages CDN cannot serve a stale
+// copy. Sort survives those refreshes (and reloads, via localStorage). Renders
+// are keyed DOM patches, so a poll only animates what changed: open "why"
+// sections, expanded cards, focus, scroll and running animations are left alone.
+// Lead cards start collapsed; the summary is a button (aria-expanded).
 
 import {
   EASE, canAnimate, reducedMotion, finePointer, shown, morphHtml, countUp, roll,
@@ -39,10 +40,13 @@ const state = {
   sort: "newest",
   filter: "all",
   openKeys: new Set(),
+  expandedKeys: new Set(),
   picks: [],
+  stopped: [],
   pricesDoc: { updated: null, prices: {} },
   picksText: null,
   pricesText: null,
+  stoppedText: null,
   checkedAt: null,
   error: null,
   loading: true,
@@ -118,11 +122,12 @@ export async function loadDataFiles(fetchImpl, loc, now = Date.now()) {
     }
     return fetchText(fetchImpl, relative);
   }
-  const [picksText, pricesText] = await Promise.all([
+  const [picksText, pricesText, stoppedText] = await Promise.all([
     loadOne("picks.json"),
     loadOne("prices.json"),
+    loadOne("stopped.json").catch(() => '{"stopped":[]}'),
   ]);
-  return { picksText, pricesText };
+  return { picksText, pricesText, stoppedText };
 }
 
 export function todayPT(now = new Date()) {
@@ -256,10 +261,35 @@ export function isFast(pick) {
   return horizonOf(pick) === "fast";
 }
 
-// The badge already says "Fast mover", so drop the prefix from the shown thesis.
+// Trade-type tags, parsed from a thesis prefix, then grade, then horizon.
+const TRADE_TYPES = [
+  { key: "trending", label: "Trending", re: /^trending:\s*/i },
+  { key: "macro", label: "Macro", re: /^macro(?:\s*\([^)]*\))?:\s*/i },
+  { key: "lottery", label: "Lottery", re: /^lottery:\s*/i },
+  { key: "long", label: "Long-term", re: /^long[\s-]?term:\s*/i },
+  { key: "medium", label: "Medium-term", re: /^medium[\s-]?term:\s*/i },
+  { key: "fast", label: "Fast mover", re: /^fast movers?:\s*/i },
+];
+
+export function tradeTypeOf(pick) {
+  const thesis = String(pick?.thesis ?? "").trimStart();
+  for (const type of TRADE_TYPES) {
+    if (type.re.test(thesis)) return type;
+  }
+  if (String(pick?.grade || "").toLowerCase() === "lottery") {
+    return { key: "lottery", label: "Lottery" };
+  }
+  if (horizonOf(pick) === "fast") {
+    return { key: "fast", label: "Fast mover" };
+  }
+  return { key: "swing", label: "Swing" };
+}
+
+// Type badges already name the setup, so drop the matching prefix from the thesis.
 function displayThesis(pick) {
-  const text = String(pick?.thesis ?? "").trimStart();
-  return isFast(pick) ? text.replace(FAST_PREFIX, "") : text;
+  let text = String(pick?.thesis ?? "").trimStart();
+  for (const type of TRADE_TYPES) text = text.replace(type.re, "");
+  return text;
 }
 
 export const FILTERS = [["all", "All"], ["swing", "Swing"], ["fast", "Fast movers"]];
@@ -499,6 +529,32 @@ function gradeBadge(grade) {
 }
 
 const FAST_BADGE = '<span class="fast-badge" title="Fast mover: about a day to a few weeks"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.2 1.5 3.5 9h4l-1 5.5L12.5 7h-4z"/></svg><span>Fast mover</span><i class="fb-streak" aria-hidden="true"></i></span>';
+
+function typeBadge(pick) {
+  const type = tradeTypeOf(pick);
+  const icon = type.key === "fast"
+    ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.2 1.5 3.5 9h4l-1 5.5L12.5 7h-4z"/></svg>'
+    : "";
+  return `<span class="type-tag type-${type.key}">${icon}<span>${escapeHtml(type.label)}</span></span>`;
+}
+
+function compactLevels(pick) {
+  const entry = pick.priceAtCall;
+  const basePct = projectedPct(entry, targetBaseOf(pick));
+  const bullPct = projectedPct(entry, targetBullOf(pick));
+  const stop = stopOf(pick);
+  const cell = (kind, label, pct, timeframe) => {
+    if (pct == null) {
+      return `<span class="sum-lv sum-${kind} is-empty"><span class="sum-k">${label}</span><span class="sum-pct flat">—</span></span>`;
+    }
+    const when = timeframe ? `<span class="sum-when">${escapeHtml(timeframe)}</span>` : "";
+    return `<span class="sum-lv sum-${kind}"><span class="sum-k">${label}</span><span class="sum-pct ${pctClass(pct)}">${escapeHtml(formatProjection(pct))}</span>${when}</span>`;
+  };
+  const stopHtml = stop == null
+    ? `<span class="sum-lv sum-stop is-empty"><span class="sum-k">Stop</span><span class="sum-px flat">—</span></span>`
+    : `<span class="sum-lv sum-stop"><span class="sum-k">Stop</span><span class="sum-px">${escapeHtml(formatPrice(stop))}</span></span>`;
+  return `<div class="sum-levels">${cell("base", "Base", basePct, baseTimeframeOf(pick))}${cell("bull", "Bull", bullPct, bullTimeframeOf(pick))}${stopHtml}</div>`;
+}
 
 const ICONS = {
   trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 7V4.8c0-.4.4-.8.8-.8h3.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.9.8 1.6 1.7 1.6h5.8c.9 0 1.6-.7 1.7-1.6L17.5 7M10 11v6M14 11v6"/></svg>',
@@ -756,6 +812,8 @@ function renderLead(pick, ctx) {
   const move = returnPct(pick, ctx.pricesDoc);
   const day = quote ? num(quote.changePct) : null;
   const pending = ctx.pending.has(key);
+  const expanded = ctx.expandedKeys.has(key);
+  const type = tradeTypeOf(pick);
   const company = pick.company ? `<p class="company">${escapeHtml(pick.company)}</p>` : "";
   const now = current == null
     ? '<span class="awaiting">awaiting price</span>'
@@ -764,43 +822,62 @@ function renderLead(pick, ctx) {
   const moveHtml = move == null
     ? '<span class="awaiting">awaiting price</span>'
     : animNum(`${key}:move`, move, "pct", formatPct(move), pctClass(move), { count: true });
+  const moveSummary = current == null ? "" : `<p class="now-move">${moveHtml}</p>`;
   const held = daysHeld(pick, ctx.today);
-  const inner = `
-    <header class="lead-head">
-      <div class="lead-id">
-        <div class="ticker-line"><h3 class="ticker" id="${id}-t">${escapeHtml(pick.ticker)}</h3>${gradeBadge(pick.grade)}${isFast(pick) ? FAST_BADGE : ""}</div>
-        ${company}
+  const summary = `
+    <button type="button" class="lead-toggle" data-expand="${escapeHtml(key)}" aria-expanded="${expanded ? "true" : "false"}" aria-controls="${id}-detail" id="${id}-toggle">
+      <div class="sum-top">
+        <div class="lead-id">
+          <div class="ticker-line"><h3 class="ticker" id="${id}-t">${escapeHtml(pick.ticker)}</h3></div>
+          ${company}
+          <div class="sum-tags">${typeBadge(pick)}${gradeBadge(pick.grade)}</div>
+        </div>
+        <div class="lead-now">
+          <p class="now-v">${now}</p>
+          ${moveSummary}
+        </div>
       </div>
-      <div class="lead-now">
-        <p class="now-k">Now</p>
-        <p class="now-v">${now}</p>
-        <p class="now-day">${dayHtml}<span class="now-day-k">today</span></p>
+      ${compactLevels(pick)}
+      <span class="lead-chev" aria-hidden="true">${ICONS.chev}</span>
+    </button>`;
+  const detail = `
+    <div class="lead-detail-wrap" id="${id}-detail"${expanded ? "" : " inert"}>
+      <div class="lead-detail">
+        ${chips(pick, current, pending)}
+        ${projection(pick, current)}
+        <dl class="quote">
+          <div><dt>Called at</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
+          <div><dt>Since called</dt><dd><span class="q-v">${move == null ? '<span class="awaiting">awaiting price</span>' : animNum(`${key}:move-d`, move, "pct", formatPct(move), pctClass(move))}</span><span class="q-sub">move, for context</span></dd></div>
+          <div><dt>Today</dt><dd><span class="q-v">${day == null ? '<span class="flat">—</span>' : animNum(`${key}:day-d`, day, "pct", formatPct(day), `pill ${pctClass(day)}`)}</span><span class="q-sub">day change</span></dd></div>
+        </dl>
+        ${chart(pick, current, id)}
+        ${range(pick, current)}
+        <dl class="levels">
+          ${levelCell("Stop", stopOf(pick), current, "lv-stop")}
+          ${levelCell("Base", targetBaseOf(pick), current, "lv-base")}
+          ${levelCell("Bull", targetBullOf(pick), current, "lv-bull")}
+        </dl>
+        <div class="notes">
+          ${blurb("Thesis", displayThesis(pick) || "—")}
+          ${pick.catalyst ? blurb("Catalyst", pick.catalyst) : ""}
+          ${pick.notes ? blurb("Notes", pick.notes) : ""}
+        </div>
+        ${reasonsBlock(pick, ctx.openKeys)}
+        <footer class="lead-foot">
+          <span class="held"><span class="k">Flagged</span> ${escapeHtml(formatAgo(held))}<span class="held-n"> · ${escapeHtml(formatDays(held))} since called</span></span>
+          ${deleteButton(pick, pending)}
+        </footer>
       </div>
-    </header>
-    ${chips(pick, current, pending)}
-    ${projection(pick, current)}
-    <dl class="quote">
-      <div><dt>Called at</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
-      <div><dt>Since called</dt><dd><span class="q-v">${moveHtml}</span><span class="q-sub">move, for context</span></dd></div>
-    </dl>
-    ${chart(pick, current, id)}
-    ${range(pick, current)}
-    <dl class="levels">
-      ${levelCell("Stop", stopOf(pick), current, "lv-stop")}
-      ${levelCell("Base", targetBaseOf(pick), current, "lv-base")}
-      ${levelCell("Bull", targetBullOf(pick), current, "lv-bull")}
-    </dl>
-    <div class="notes">
-      ${blurb("Thesis", displayThesis(pick) || "—")}
-      ${pick.catalyst ? blurb("Catalyst", pick.catalyst) : ""}
-      ${pick.notes ? blurb("Notes", pick.notes) : ""}
-    </div>
-    ${reasonsBlock(pick, ctx.openKeys)}
-    <footer class="lead-foot">
-      <span class="held"><span class="k">Flagged</span> ${escapeHtml(formatAgo(held))}<span class="held-n"> · ${escapeHtml(formatDays(held))} since called</span></span>
-      ${deleteButton(pick, pending)}
-    </footer>`;
-  return `<article class="lead tone-${tone}${isFast(pick) ? " is-fast" : ""}${pending ? " is-pending" : ""}" data-key="${escapeHtml(key)}" data-flip data-pick="${escapeHtml(key)}|open" data-tone="${tone}" aria-labelledby="${id}-t">${cardShell(inner)}</article>`;
+    </div>`;
+  const cls = [
+    "lead",
+    `tone-${tone}`,
+    isFast(pick) ? "is-fast" : "",
+    `is-type-${type.key}`,
+    pending ? "is-pending" : "",
+    expanded ? "is-open" : "",
+  ].filter(Boolean).join(" ");
+  return `<article class="${cls}" data-key="${escapeHtml(key)}" data-flip data-pick="${escapeHtml(key)}|open" data-tone="${tone}" aria-labelledby="${id}-t">${cardShell(summary + detail)}</article>`;
 }
 
 function renderArchived(pick, ctx) {
@@ -808,39 +885,94 @@ function renderArchived(pick, ctx) {
   const id = domId(key);
   const move = returnPct(pick, ctx.pricesDoc);
   const pending = ctx.pending.has(key);
+  const expanded = ctx.expandedKeys.has(key);
+  const type = tradeTypeOf(pick);
   const company = pick.company ? `<p class="company">${escapeHtml(pick.company)}</p>` : "";
   const exit = num(pick.exitPrice);
   const moveHtml = move == null ? '<span class="flat">—</span>' : `<span class="${pctClass(move)}">${escapeHtml(formatPct(move))}</span>`;
-  const inner = `
-    <header class="lead-head">
-      <div class="lead-id">
-        <div class="ticker-line"><h3 class="ticker" id="${id}-t">${escapeHtml(pick.ticker)}</h3>${gradeBadge(pick.grade)}${isFast(pick) ? FAST_BADGE : ""}<span class="tag-archived">Archived</span></div>
-        ${company}
+  const summary = `
+    <button type="button" class="lead-toggle" data-expand="${escapeHtml(key)}" aria-expanded="${expanded ? "true" : "false"}" aria-controls="${id}-detail" id="${id}-toggle">
+      <div class="sum-top">
+        <div class="lead-id">
+          <div class="ticker-line"><h3 class="ticker" id="${id}-t">${escapeHtml(pick.ticker)}</h3></div>
+          ${company}
+          <div class="sum-tags">${typeBadge(pick)}${gradeBadge(pick.grade)}<span class="tag-archived">Archived</span></div>
+        </div>
+        <div class="lead-now">
+          <p class="now-k">Closed at</p>
+          <p class="now-v">${escapeHtml(formatPrice(exit))}</p>
+          <p class="now-move">${moveHtml}</p>
+        </div>
       </div>
-      <div class="lead-now">
-        <p class="now-k">Closed at</p>
-        <p class="now-v">${escapeHtml(formatPrice(exit))}</p>
-        <p class="now-day"><span class="now-day-k">${escapeHtml(formatDay(pick.exitDate))}</span></p>
+      ${compactLevels(pick)}
+      <span class="lead-chev" aria-hidden="true">${ICONS.chev}</span>
+    </button>`;
+  const detail = `
+    <div class="lead-detail-wrap" id="${id}-detail"${expanded ? "" : " inert"}>
+      <div class="lead-detail">
+        ${chips(pick, exit, pending)}
+        ${projection(pick, exit, true)}
+        <dl class="quote quote-4">
+          <div><dt>Called at</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
+          <div><dt>Closed</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.exitPrice))}</span><span class="q-sub">${escapeHtml(formatDay(pick.exitDate))}</span></dd></div>
+          <div><dt>Call → close</dt><dd><span class="q-v">${moveHtml}</span><span class="q-sub">move</span></dd></div>
+          <div><dt>Listed</dt><dd><span class="q-v">${escapeHtml(formatDays(daysHeld(pick, ctx.today)))}</span><span class="q-sub">on the feed</span></dd></div>
+        </dl>
+        <div class="notes">
+          ${blurb("Notes", pick.notes || "—")}
+          ${pick.thesis ? blurb("Thesis", displayThesis(pick)) : ""}
+        </div>
+        ${reasonsBlock(pick, ctx.openKeys)}
+        <footer class="lead-foot">
+          <span class="held"><span class="k">Flagged</span> ${escapeHtml(formatDay(pick.dateCalled))}</span>
+          ${deleteButton(pick, pending)}
+        </footer>
       </div>
-    </header>
-    ${chips(pick, exit, pending)}
-    ${projection(pick, exit, true)}
-    <dl class="quote quote-4">
-      <div><dt>Called at</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
-      <div><dt>Closed</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.exitPrice))}</span><span class="q-sub">${escapeHtml(formatDay(pick.exitDate))}</span></dd></div>
-      <div><dt>Call → close</dt><dd><span class="q-v">${moveHtml}</span><span class="q-sub">move</span></dd></div>
-      <div><dt>Listed</dt><dd><span class="q-v">${escapeHtml(formatDays(daysHeld(pick, ctx.today)))}</span><span class="q-sub">on the feed</span></dd></div>
-    </dl>
-    <div class="notes">
-      ${blurb("Notes", pick.notes || "—")}
-      ${pick.thesis ? blurb("Thesis", displayThesis(pick)) : ""}
-    </div>
-    ${reasonsBlock(pick, ctx.openKeys)}
-    <footer class="lead-foot">
-      <span class="held"><span class="k">Flagged</span> ${escapeHtml(formatDay(pick.dateCalled))}</span>
-      ${deleteButton(pick, pending)}
-    </footer>`;
-  return `<article class="lead lead-archived${isFast(pick) ? " is-fast" : ""}${pending ? " is-pending" : ""}" data-key="${escapeHtml(key)}" data-flip data-pick="${escapeHtml(key)}|closed" data-tone="archived" aria-labelledby="${id}-t">${cardShell(inner)}</article>`;
+    </div>`;
+  const cls = [
+    "lead",
+    "lead-archived",
+    isFast(pick) ? "is-fast" : "",
+    `is-type-${type.key}`,
+    pending ? "is-pending" : "",
+    expanded ? "is-open" : "",
+  ].filter(Boolean).join(" ");
+  return `<article class="${cls}" data-key="${escapeHtml(key)}" data-flip data-pick="${escapeHtml(key)}|closed" data-tone="archived" aria-labelledby="${id}-t">${cardShell(summary + detail)}</article>`;
+}
+
+function renderStopped(stopped) {
+  const raw = Array.isArray(stopped) ? stopped.filter((row) => row && typeof row === "object") : [];
+  if (!raw.length) return "";
+  const list = raw.slice(0, 10);
+  const items = list.map((row) => {
+    const original = row.pick && typeof row.pick === "object" ? row.pick : {};
+    const ticker = escapeHtml(original.ticker || "—");
+    const day = escapeHtml(formatDay(row.stoppedDate) || String(row.stoppedDate || "—"));
+    const close = num(row.closePrice);
+    const closeText = close == null ? "—" : formatPrice(close);
+    const move = num(row.returnPct);
+    const moveText = move == null ? "—" : formatPct(move);
+    const cls = move == null ? "flat" : pctClass(move);
+    return `<li class="stopped-row">
+      <span class="stopped-ticker">${ticker}</span>
+      <span class="stopped-day">${day}</span>
+      <span class="stopped-close">close ${escapeHtml(closeText)}</span>
+      <span class="stopped-ret ${cls}">${escapeHtml(moveText)}</span>
+    </li>`;
+  }).join("");
+  return `<section class="block block-stopped" data-key="sec-stopped">
+    <details class="stopped-box">
+      <summary data-ripple>
+        <span class="stopped-title">Recently stopped out</span>
+        <span class="count">${list.length}</span>
+        ${ICONS.chev}
+      </summary>
+      <div class="stopped-body">
+        <p class="stopped-note">Dropped after a daily close at or below the stop. A ticker can come back later if a new setup appears.</p>
+        <ul class="stopped-list">${items}</ul>
+      </div>
+    </details>
+  </section>`;
 }
 
 function sortRail(sort) {
@@ -902,9 +1034,11 @@ export function renderBoard(model) {
   const pricesDoc = model.pricesDoc || { updated: null, prices: {} };
   const sort = SORT_VALUES.has(model.sort) ? model.sort : "newest";
   const openKeys = model.openKeys instanceof Set ? model.openKeys : new Set(model.openKeys || []);
+  const expandedKeys = model.expandedKeys instanceof Set ? model.expandedKeys : new Set(model.expandedKeys || []);
   const pending = model.pending instanceof Map ? model.pending : new Map();
   const now = model.now instanceof Date ? model.now : new Date();
-  const ctx = { pricesDoc, today: todayPT(now), openKeys, pending };
+  const ctx = { pricesDoc, today: todayPT(now), openKeys, expandedKeys, pending };
+  const stopped = Array.isArray(model.stopped) ? model.stopped : [];
 
   if (!model.loaded && model.loading) return skeleton();
   if (!model.loaded && model.error) {
@@ -931,6 +1065,7 @@ export function renderBoard(model) {
     ${open.length ? filterBar(filter, open) : ""}
     ${activeBody}
   </section>`;
+  html += renderStopped(stopped);
   if (closed.length) {
     html += `<section class="block block-archive" data-key="sec-archive" aria-labelledby="h-archive">
       <div class="section-head"><h2 id="h-archive"><span class="h-idx" aria-hidden="true">02</span>Archive <span class="count">${closed.length}</span><span class="h-sub">past leads</span></h2></div>
@@ -1295,7 +1430,9 @@ function model() {
     loading: state.loading,
     loaded: state.loaded,
     openKeys: state.openKeys,
+    expandedKeys: state.expandedKeys,
     pending: state.pending,
+    stopped: state.stopped,
     now: new Date(),
   };
 }
@@ -1508,15 +1645,18 @@ async function poll() {
   polling = true;
   clearTimeout(pollTimer);
   try {
-    const { picksText, pricesText } = await loadDataFiles(timedFetch, location, Date.now());
+    const { picksText, pricesText, stoppedText } = await loadDataFiles(timedFetch, location, Date.now());
     const picksDoc = JSON.parse(picksText);
     const pricesDoc = JSON.parse(pricesText);
+    let stoppedDoc = { stopped: [] };
+    try { stoppedDoc = JSON.parse(stoppedText || '{"stopped":[]}'); } catch { stoppedDoc = { stopped: [] }; }
     state.checkedAt = new Date().toISOString();
     state.error = null;
     state.loading = false;
-    const changed = picksText !== state.picksText || pricesText !== state.pricesText || !state.loaded;
+    const changed = picksText !== state.picksText || pricesText !== state.pricesText || stoppedText !== state.stoppedText || !state.loaded;
     state.picksText = picksText;
     state.pricesText = pricesText;
+    state.stoppedText = stoppedText;
     state.loaded = true;
     scheduleNext();
     // Same bytes as last time: refresh the clock only, keep everything else.
@@ -1528,6 +1668,7 @@ async function poll() {
       return;
     }
     state.picks = Array.isArray(picksDoc?.picks) ? picksDoc.picks.filter((pick) => pick && typeof pick === "object") : [];
+    state.stopped = Array.isArray(stoppedDoc?.stopped) ? stoppedDoc.stopped.filter((row) => row && typeof row === "object") : [];
     state.pricesDoc = {
       updated: pricesDoc?.updated ?? null,
       prices: pricesDoc?.prices && typeof pricesDoc.prices === "object" ? pricesDoc.prices : {},
@@ -1871,8 +2012,36 @@ function onClick(event) {
     if (pick && canDelete(pick)) openModal(pick, del);
     return;
   }
+  const toggle = event.target.closest?.("[data-expand]");
+  if (toggle) {
+    toggleLead(toggle);
+    return;
+  }
   const summary = event.target.closest?.("details.why > summary");
   if (summary) animateWhy(event, summary);
+}
+
+function setLeadOpen(article, open) {
+  if (!article) return;
+  article.classList.toggle("is-open", open);
+  const button = article.querySelector("[data-expand]");
+  const panel = article.querySelector(".lead-detail-wrap");
+  if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
+  if (panel) {
+    if (open) panel.removeAttribute("inert");
+    else panel.setAttribute("inert", "");
+  }
+}
+
+function toggleLead(button) {
+  const article = button.closest(".lead");
+  if (!article) return;
+  const key = button.getAttribute("data-expand") || article.getAttribute("data-key");
+  const open = !article.classList.contains("is-open");
+  setLeadOpen(article, open);
+  if (!key) return;
+  if (open) state.expandedKeys.add(key);
+  else state.expandedKeys.delete(key);
 }
 
 // Smooth height open/close; the native <details> still owns state, keyboard

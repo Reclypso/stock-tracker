@@ -5,6 +5,8 @@ on:
   schedule:
     # Every 15 minutes, weekdays, 13:00–21:45 UTC.
     # Covers US cash session in both EST (14:30–21:00 UTC) and EDT (13:30–21:00 UTC).
+    # The stop-out check uses the official daily close of the last completed
+    # session (after 16:05 ET), so mid-day dips cannot drop a lead.
     - cron: "*/15 13-21 * * 1-5"
   push:
     branches:
@@ -40,16 +42,31 @@ jobs:
       - name: Fetch prices
         run: python scripts/fetch_prices.py
 
-      - name: Commit and push if prices changed
+      - name: Drop leads that closed at or below their stop
         run: |
-          if git diff --quiet -- data/prices.json; then
-            echo "No price changes."
+          python scripts/check_stops.py | tee "$RUNNER_TEMP/stops.out"
+          sed -n 's/^STOPPED_TICKERS=//p' "$RUNNER_TEMP/stops.out" > "$RUNNER_TEMP/stopped-tickers.txt"
+
+      - name: Commit and push if data changed
+        run: |
+          if git diff --quiet -- data/prices.json data/picks.json data/stopped.json; then
+            echo "No changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- data/prices.json
-          git commit -m "Update prices [skip ci]"
+          git add -- data/prices.json data/picks.json data/stopped.json
+          TICKERS="$(tr -d '[:space:]' < "$RUNNER_TEMP/stopped-tickers.txt" 2>/dev/null || true)"
+          if [ -n "$TICKERS" ]; then
+            if git diff --quiet --cached -- data/prices.json; then
+              MSG="Stop out ${TICKERS} [skip ci]"
+            else
+              MSG="Update prices and stop out ${TICKERS} [skip ci]"
+            fi
+          else
+            MSG="Update prices [skip ci]"
+          fi
+          git commit -m "$MSG"
           # Schedule and dispatch checkouts are often detached, so pull and
           # push name origin/main explicitly. Retry the push once.
           git pull --rebase origin main

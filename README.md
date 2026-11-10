@@ -8,7 +8,7 @@ This is not a brokerage feed. Quotes are delayed Yahoo prices via `yfinance`, re
 
 ## How it stays up to date
 
-- On load, and every 60 seconds after that, the page reads `data/picks.json` and `data/prices.json`.
+- On load, and every 60 seconds after that, the page reads `data/picks.json`, `data/prices.json`, and `data/stopped.json` (a missing stopped file is treated as empty).
 - On `*.github.io` it fetches `https://raw.githubusercontent.com/Reclypso/stock-tracker/main/data/<file>?t=<timestamp>` with `cache: "no-store"`, so the GitHub Pages CDN does not freeze an old copy. If that request fails, it falls back to `./data/<file>`.
 - On localhost it uses `./data/<file>?t=<timestamp>`. Add `?demo=1` on localhost to load `./demo/` instead.
 - `OWNER`, `REPO`, and `BRANCH` at the top of `app.js` control the raw URL (`Reclypso`, `stock-tracker`, `main`).
@@ -30,7 +30,7 @@ The script reads open tickers only, asks Yahoo for the last price, previous clos
 }
 ```
 
-When something did change, the action commits as `github-actions[bot]` with the message `Update prices [skip ci]` and pushes to `main` (`git pull --rebase` first, one retry).
+Right after prices are written, `scripts/check_stops.py` looks at the official daily close of the most recent *completed* US regular session (after 16:05 ET; never an intraday wick). If that close is at or below an open long pick's stop, and the session closed after the pick was called, the lead is removed from `data/picks.json` and prepended to `data/stopped.json` with the stop-out date, the close, the percent change from entry, and the original pick. Missing, zero, or invalid prices leave the lead in place. The action then commits any changed `data/prices.json`, `data/picks.json`, and `data/stopped.json` as `github-actions[bot]` (`Update prices [skip ci]`, or a "Stop out TICKER" message when leads dropped) and pushes to `main` (`git pull --rebase` first, one retry). `pick.mjs add` can re-add a ticker that is in `stopped.json`; a new, solid setup is allowed back on the board.
 
 ## Pick fields
 
@@ -64,7 +64,7 @@ Each item in `picks[]`:
 
 Projected percent is `(target - priceAtCall) / priceAtCall * 100`, shown for the base and bull targets. The progress bar is 0% at the call price and 100% at the base target. Below the call price it draws in red. Chips mark **Base hit**, **Bull hit**, and **Stop hit**.
 
-Each lead card leads with its projection: **Base +55% in 3-6 months** and **Bull +140% in 6-12 months if …**. Open picks without a price say **awaiting price**. Closed picks move to the **Archive** and use `exitPrice`. The page is a feed of leads, not a scorecard: it shows the move since each call for context but no win rate or average return. Fast movers get a **Fast mover** badge, and the **All · Swing · Fast movers** filter (remembered per browser) narrows the active list.
+Each lead starts as a compact row: ticker and name, a trade-type tag (Fast mover, Medium-term, Long-term, Lottery, Macro, Trending — parsed from the thesis prefix, otherwise the horizon or grade), grade, current price and move since entry, base and bull percentages with timeframes, and the stop. Tap or click the row to expand the full card (thesis, bull-case condition, reasons, sources, chart, delete). Closed picks move to the **Archive** and use `exitPrice`. Leads that automatically stopped out appear in a collapsed **Recently stopped out** note. The page is a feed of leads, not a scorecard: it shows the move since each call for context but no win rate or average return. The **All · Swing · Fast movers** filter (remembered per browser) narrows the active list.
 
 ## CLI
 
