@@ -822,6 +822,77 @@
       "bullTimeframe": "2-3 months",
       "bullCase": "the Q4 report in February beats again and cloud growth stays above 50%",
       "horizon": "swing"
+    },
+    {
+      "id": "2026-11-10-XERS",
+      "ticker": "XERS",
+      "company": "Xeris Biopharma",
+      "dateCalled": "2026-11-10",
+      "calledAt": "2026-11-10T16:56:28.076Z",
+      "priceAtCall": 15.59,
+      "thesis": "Medium-term: post-earnings drift after a beat-and-raise; Xeris lifted 2026 revenue guidance and its 2030 outlook to over $1B, and the gap has held for three days. Graded C because the stock has already about tripled this year and carries a lot of debt.",
+      "catalyst": "Q3 2026 beat-and-raise (Nov 5): revenue $107.2M (+44% y/y) vs about $101.7M expected, Recorlev +93%; FY26 guide raised to $395-405M; 2030 outlook raised to over $1B from about $750M",
+      "grade": "C",
+      "stop": 14,
+      "target": 19,
+      "targetBase": 19,
+      "targetBull": 23,
+      "timeframe": "1-3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 revenue $107.2M (+44%), Recorlev $71.5M (+93%), net income $11.3M; FY26 guide $395-405M from $385-390M; 2030 outlook over $1B",
+          "sources": [
+            {
+              "title": "Xeris Q3 2026 release",
+              "url": "https://investors.xerispharma.com/news-releases/news-release-details/xeris-biopharma-reports-third-quarter-2026-financial-results-and"
+            }
+          ]
+        },
+        {
+          "text": "Beat FactSet consensus (6c vs 3c EPS, $107.2M vs $101.7M revenue) and 2030 target well above the $719M analysts modeled",
+          "sources": [
+            {
+              "title": "MarketWatch",
+              "url": "https://www.marketwatch.com/story/xeris-biopharma-shares-rally-on-lifted-guidance-3q-beat-c41c5f61"
+            }
+          ]
+        },
+        {
+          "text": "Target raises: HC Wainwright $18 from $10; Oppenheimer reaffirmed Outperform",
+          "sources": [
+            {
+              "title": "TradingView/HCW",
+              "url": "https://www.tradingview.com/news/tradingview:ad1de942a4ba8:0-hc-wainwright-co-maintains-xeris-biopharma-holdings-at-buy-raises-price-target-to-18-from-10/"
+            }
+          ]
+        },
+        {
+          "text": "Gap held: closed $10.46 Nov 4, opened $12.41 Nov 5, now about $15.6 near the 52-week high (Alpaca data); no S-3/424B/ATM filings since May (EDGAR); July 3.02 was a convertible-note exchange that retired 2028 notes",
+          "sources": [
+            {
+              "title": "EDGAR 8-K Jul 2026",
+              "url": "https://www.sec.gov/Archives/edgar/data/1867096/000186709626000055/xers-20260715.htm"
+            }
+          ]
+        },
+        {
+          "text": "Risks: already about tripled from a $5.25 low and far above its 50-day average (about $9.6), high debt, insiders selling under 10b5-1 plans; X chatter small (no hype spike)",
+          "sources": [
+            {
+              "title": "American Banking News",
+              "url": "https://www.americanbankingnews.com/2026/11/09/xeris-biopharma-nasdaqxers-price-target-raised-to-18-00.html"
+            }
+          ]
+        }
+      ],
+      "baseTimeframe": "1-2 months",
+      "bullTimeframe": "2-3 months",
+      "bullCase": "Recorlev keeps growing fast and more analysts lift targets toward the new $1B-by-2030 outlook",
+      "horizon": "swing"
     }
   ]
 }
