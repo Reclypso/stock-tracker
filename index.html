@@ -4,23 +4,93 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#07090d">
-  <meta name="description" content="Shared live tracker for Stock Bot picks. Prices refresh on their own.">
-  <title>Stock Bot Pick Tracker</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e141d'/%3E%3Cpath d='M7 21.5 13 15l4 3.5 8-10' fill='none' stroke='%2334e3a4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#04050b">
+  <meta name="description" content="A live feed of leads flagged by Stock Bot: thesis, targets, stops and sources. Prices refresh on their own.">
+  <title>Stock Bot Leads</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2329ffb0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%23070a14'/%3E%3Cpath d='M7 21.5 13 15l4 3.5 8-10' fill='none' stroke='url(%23g)' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script>
+    // Hide intro targets before first paint; app.js reveals them. Safety net:
+    // if scripts never run, show everything after 2.5s.
+    (function () {
+      var d = document.documentElement;
+      d.classList.add("js");
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!still) {
+        d.classList.add("intro-pending");
+        setTimeout(function () { d.classList.remove("intro-pending"); }, 2500);
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@500;600&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@400..700&family=Space+Grotesk:wght@400..700&display=swap" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <div class="backdrop" aria-hidden="true"></div>
-  <div id="app" class="app">
-    <p class="loading">Loading picks…</p>
+  <div class="backdrop" aria-hidden="true">
+    <canvas id="bg" class="bg-canvas"></canvas>
+    <div class="bg-veil"></div>
+    <div class="bg-noise"></div>
   </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="Stock Bot Leads, back to top">
+        <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="logo-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#7c5cff"/><stop offset="0.55" stop-color="#3ad6ff"/><stop offset="1" stop-color="#29ffb0"/></linearGradient></defs><rect x="0.75" y="0.75" width="30.5" height="30.5" rx="8.5" fill="rgba(10,14,28,0.9)" stroke="url(#logo-g)" stroke-opacity="0.55"/><path class="logo-line" d="M7 21.5 13 15l4 3.5 8-10" fill="none" stroke="url(#logo-g)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 8.5h5.5V14" fill="none" stroke="url(#logo-g)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="brand-name">Stock Bot</span>
+      </a>
+      <div class="topbar-meta">
+        <span id="live" class="live ok" role="status"><span class="live-dot" aria-hidden="true"><i></i><i></i></span><span id="live-label">Live</span></span>
+      </div>
+    </div>
+    <div class="poll-line" aria-hidden="true"><span id="poll-line"></span></div>
+  </header>
+
+  <div id="top" class="page">
+    <section class="hero" aria-labelledby="wordmark">
+      <div class="hero-frame" aria-hidden="true">
+        <span class="fl fl-t"></span><span class="fl fl-b"></span><span class="fl fl-l"></span><span class="fl fl-r"></span>
+        <span class="fc fc-tl"></span><span class="fc fc-tr"></span><span class="fc fc-bl"></span><span class="fc fc-br"></span>
+        <span class="fx fx-a">SYS/ONLINE</span><span class="fx fx-b">FEED · DELAYED · PT</span>
+      </div>
+      <div class="hero-main">
+        <p class="kicker"><span class="kicker-dot" aria-hidden="true"></span>Live signal feed</p>
+        <h1 id="wordmark" class="wordmark" aria-label="Stock Bot Leads">
+          <span class="wm" aria-hidden="true" data-text="STOCK BOT">STOCK BOT</span>
+          <span class="wm-sub" aria-hidden="true">Leads&nbsp;Feed</span>
+        </h1>
+        <p class="tagline">Curated leads flagged by Stock Bot &mdash; each with its thesis, projected base and bull case, stop and sources, tracked against live quotes. Refreshes every minute, no reload needed.</p>
+      </div>
+      <div class="hero-side">
+        <dl class="meta">
+          <div class="meta-item"><dt>Prices updated</dt><dd id="prices-at" class="mono">—</dd></div>
+          <div class="meta-item"><dt>Checked</dt><dd id="checked-at" class="mono">—</dd></div>
+        </dl>
+        <p id="status-note" class="status-note" role="status"></p>
+        <section id="summary" class="cluster" aria-label="Feed status"></section>
+      </div>
+    </section>
+
+    <div id="tape" class="tape" aria-hidden="true"></div>
+
+    <main id="board" class="board">
+      <p class="loading">Loading leads…</p>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-mark" aria-hidden="true">STOCK BOT</div>
+      <div class="footer-body">
+        <p class="footer-main">Not financial advice. Leads can go to zero.</p>
+        <p class="footer-sub">Quotes are delayed. Times shown in Pacific.</p>
+      </div>
+    </footer>
+  </div>
+
   <noscript>
-    <p class="loading">This tracker needs JavaScript to load picks.</p>
+    <p class="loading">This feed needs JavaScript to load leads.</p>
   </noscript>
+  <script defer src="./vendor/gsap.min.js"></script>
+  <script defer src="./vendor/ScrollTrigger.min.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

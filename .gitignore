@@ -3,3 +3,4 @@ __pycache__/
 demo/
 _*.txt
 tools/*.flag
+tools/v2-shots/

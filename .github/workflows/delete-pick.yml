@@ -1,0 +1,116 @@
+name: Delete pick
+
+# Removes a lead from data/picks.json so it disappears for everyone.
+#  - issues: someone on .github/delete-allowlist.txt opens an issue titled
+#    "delete-pick: <id>" (the site's Delete button pre-fills it).
+#  - workflow_dispatch: a collaborator runs it by hand with the id.
+# Event text only reaches shell through env vars; the helper validates it.
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "Pick id, e.g. 2026-11-09-IONQ"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: delete-pick
+  cancel-in-progress: false
+
+jobs:
+  delete:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.issue.title, 'delete-pick:')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      EVENT_NAME: ${{ github.event_name }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      INPUT_ID: ${{ inputs.id }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate request
+        id: check
+        run: node .github/scripts/delete-request.mjs
+
+      - name: Reject
+        if: steps.check.outputs.action == 'reject' && github.event_name == 'issues'
+        env:
+          MESSAGE_FILE: ${{ steps.check.outputs.message_file }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body-file "$MESSAGE_FILE"
+          gh issue close "$ISSUE_NUMBER" --reason "not planned"
+
+      - name: Reject (manual run)
+        if: steps.check.outputs.action == 'reject' && github.event_name == 'workflow_dispatch'
+        env:
+          MESSAGE_FILE: ${{ steps.check.outputs.message_file }}
+        run: |
+          cat "$MESSAGE_FILE"
+          exit 1
+
+      - name: Remove, commit and push
+        if: steps.check.outputs.action == 'remove'
+        env:
+          PICK_ID: ${{ steps.check.outputs.id }}
+          COMMIT_FILE: ${{ steps.check.outputs.commit_file }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          remove_and_commit() {
+            node scripts/pick.mjs remove --id "$PICK_ID" --no-push
+            git add -- data/picks.json
+            git commit -F "$COMMIT_FILE" -- data/picks.json
+          }
+
+          remove_and_commit
+          # Another job may have added picks meanwhile: rebase onto it, never
+          # force. If the rebase conflicts or the push is rejected, start over
+          # from the newest main and remove the id again (one retry).
+          if git pull --rebase origin main && git push origin HEAD:main; then
+            exit 0
+          fi
+          git rebase --abort 2>/dev/null || true
+          git fetch origin main
+          git reset --hard origin/main
+          if ! node -e 'const d=require("./data/picks.json");process.exit(d.picks.some(p=>p&&p.id===process.argv[1])?0:1)' "$PICK_ID"; then
+            echo "Already removed upstream."
+            exit 0
+          fi
+          remove_and_commit
+          git push origin HEAD:main
+
+      - name: Confirm on issue
+        if: steps.check.outputs.action == 'remove' && github.event_name == 'issues'
+        env:
+          MESSAGE_FILE: ${{ steps.check.outputs.message_file }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body-file "$MESSAGE_FILE"
+          gh issue close "$ISSUE_NUMBER" --reason completed
+
+      - name: Report failure on issue
+        if: failure() && github.event_name == 'issues'
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "The delete run failed, so nothing was removed. Check the Actions log for this run, or try again."

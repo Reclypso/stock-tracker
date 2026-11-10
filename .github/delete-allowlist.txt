@@ -1,0 +1,4 @@
+# GitHub usernames allowed to delete leads by opening a "delete-pick: <id>" issue.
+# One login per line, case-insensitive. Lines starting with # are comments.
+# Add your friend's GitHub username on its own line below, then commit to main.
+Reclypso

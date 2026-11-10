@@ -1,0 +1,7 @@
+# Cloudflare Worker for one-click lead deletes. See worker/README.md.
+# Secrets (never commit them): wrangler secret put DELETE_PASSCODE
+#                              wrangler secret put GITHUB_TOKEN
+name = "stock-tracker-delete"
+main = "delete-worker.js"
+compatibility_date = "2026-11-01"
+workers_dev = true

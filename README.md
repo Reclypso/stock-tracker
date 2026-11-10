@@ -52,6 +52,10 @@ Each item in `picks[]`:
 | `targetBase` | Base target price, or `null` |
 | `targetBull` | Bull target price, or `null` |
 | `timeframe` | Text such as `"3-6 months"`, or `null` |
+| `baseTimeframe` | Optional. Time period for the base case. Falls back to `timeframe` |
+| `bullTimeframe` | Optional. Time period for the bull case. Falls back to `timeframe` |
+| `bullCase` | Optional. The condition behind the bull target, shown as "if …" (e.g. `"the FDA approves X"`) |
+| `horizon` | Optional. `"swing"` (default, 3-12 months) or `"fast"` (about a day to a few weeks). Without it, a thesis starting with `Fast mover:` counts as fast |
 | `status` | `open` or `closed` |
 | `exitDate` | `YYYY-MM-DD`, or `null` |
 | `exitPrice` | Exit price, or `null` |
@@ -60,9 +64,7 @@ Each item in `picks[]`:
 
 Projected percent is `(target - priceAtCall) / priceAtCall * 100`, shown for the base and bull targets. The progress bar is 0% at the call price and 100% at the base target. Below the call price it draws in red. Chips mark **Base hit**, **Bull hit**, and **Stop hit**.
 
-Open picks without a price say **awaiting price** and are left out of the average return. Closed picks use `exitPrice`.
-
-Win rate is closed winners divided by closed picks. A winner has a positive return. If nothing is closed yet, it is winners divided by every pick (a name still awaiting a price is not a win) and the card says **incl. open**. If nothing has a price yet, the card shows an em dash instead of 0%.
+Each lead card leads with its projection: **Base +55% in 3-6 months** and **Bull +140% in 6-12 months if …**. Open picks without a price say **awaiting price**. Closed picks move to the **Archive** and use `exitPrice`. The page is a feed of leads, not a scorecard: it shows the move since each call for context but no win rate or average return. Fast movers get a **Fast mover** badge, and the **All · Swing · Fast movers** filter (remembered per browser) narrows the active list.
 
 ## CLI
 
@@ -108,6 +110,12 @@ Replace every reason:
 
 ```bash
 node scripts/pick.mjs update --id 2026-11-09-IONQ --clear-reasons --reason "Fresh thesis" --source "Note|https://example.com/note"
+```
+
+Projection details and horizon (all optional; `""` clears the three text fields on `update`):
+
+```bash
+node scripts/pick.mjs update --id 2026-11-09-IONQ --base-timeframe "3-6 months" --bull-timeframe "6-12 months" --bull-case "the DOD contract is signed" --horizon fast
 ```
 
 Any add field can be passed to `update` (`--ticker`, `--price`, `--company`, `--thesis`, `--catalyst`, `--grade`, `--stop`, `--target`, `--target-base`, `--target-bull`, `--timeframe`, `--notes`, `--date`). `--price` changes the call price, not the exit.
@@ -169,14 +177,27 @@ Fake rows for screenshots (not published; `demo/` is gitignored):
 
 http://localhost:8000/?demo=1
 
-`?demo=1` loads `./demo/*.json` only when the host is localhost. The sample tickers are `DEMO1`, `DEMO2`, and `DEMO3`.
+`?demo=1` loads `./demo/*.json` only when the host is localhost. The sample tickers are `DEMO1` through `DEMO10`, covering every card state (up, down, near stop, stop hit, base hit, bull hit, awaiting price, fast movers, archived).
 
 Enable GitHub Pages on the `main` branch, root (`/`), for the live URL above. Push an initial commit yourself before using the CLI without `--no-push`. The price workflow needs that branch on the remote.
 
+## Deleting leads
+
+Either of you can delete a lead for everyone. The delete commits a change to `data/picks.json`; nothing is only hidden locally, and no token lives in the page or the repo.
+
+1. Press the trash icon on a card, then **Continue on GitHub** in the dialog.
+2. GitHub opens a pre-filled issue titled `delete-pick: <id>`. Press **Submit new issue**.
+3. `.github/workflows/delete-pick.yml` checks that the issue author is listed in `.github/delete-allowlist.txt` and that the id exists, runs `node scripts/pick.mjs remove --id <id> --no-push`, commits `Remove pick TICKER (requested by @login via #N)`, rebases onto `main` and pushes (one retry, never a force push). It then comments and closes the issue. Anyone not on the allowlist gets a comment and nothing changes.
+4. The card shows **Deletion requested…** for up to 15 minutes and animates out once the lead is gone from `data/picks.json` (usually within about 5 minutes because of GitHub's raw cache).
+
+Add your friend's GitHub username to `.github/delete-allowlist.txt` (one login per line) and commit it to `main`. A collaborator can also run the **Delete pick** workflow by hand with the id.
+
+Optional one-click delete: `worker/` holds a small Cloudflare Worker that takes a shared passcode and starts the same workflow. It is off until you deploy it and set `DELETE_ENDPOINT` in `app.js`. Setup steps are in `worker/README.md`.
+
 ## Design
 
-Dark HUD theme in plain HTML/CSS/JS, no build step and no animation library (Web Animations API + CSS). Numbers count up and progress bars fill on first load. After that, only values that change during polling animate: green flash up, red flash down, and new picks slide in. `prefers-reduced-motion` turns the movement off. Inter loads from Google Fonts if available; otherwise the system font stack is used. For local testing, `?demo=1&fast=1` on localhost polls every 5s instead of 60s.
+A live signal feed, built in plain HTML/CSS/JS with no build step. The background is a hand-written WebGL shader (`bg.js`: aurora curtains, a perspective neon grid and a parallax starfield) that pauses when the tab is hidden, caps resolution on phones, and falls back to a CSS gradient. GSAP 3.12.5 and ScrollTrigger are vendored in `vendor/` and drive the intro (HUD frame draw-in, wordmark decode, staggered 3D card entrance) and scroll reveals; without them the page still renders everything. Polls patch the DOM in place (`fx.js` keyed morph), so open "why" sections, sort, filter, focus and scroll survive, and only changes animate: price digits roll and flash, meters glide, new leads slide in, removed ones dissolve. Cards tilt with a cursor spotlight on desktop and ripple on tap. `prefers-reduced-motion` turns motion off. Fonts are Space Grotesk, Inter and JetBrains Mono from Google Fonts with system fallbacks. For local testing, `?demo=1&fast=1` on localhost polls every 5s instead of 60s.
 
 ## Disclaimer
 
-Not financial advice. Ideas can go to zero.
+Not financial advice. Leads can go to zero.

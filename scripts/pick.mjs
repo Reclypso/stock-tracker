@@ -36,6 +36,10 @@ const VALUE_FLAGS = new Set([
   "target-base",
   "target-bull",
   "timeframe",
+  "base-timeframe",
+  "bull-timeframe",
+  "bull-case",
+  "horizon",
   "notes",
   "date",
   "id",
@@ -43,15 +47,24 @@ const VALUE_FLAGS = new Set([
   "source",
 ]);
 
+// Optional projection text. Flag name -> pick field. Empty string clears it on update.
+const PROJECTION_FIELDS = {
+  "base-timeframe": "baseTimeframe",
+  "bull-timeframe": "bullTimeframe",
+  "bull-case": "bullCase",
+};
+const PROJECTION_FLAGS = Object.keys(PROJECTION_FIELDS);
+
 const ALLOWED = {
   add: new Set([
     "ticker", "price", "company", "thesis", "catalyst", "grade", "stop",
     "target", "target-base", "target-bull", "timeframe", "notes", "date", "no-push",
+    ...PROJECTION_FLAGS, "horizon",
   ]),
   update: new Set([
     "id", "ticker", "price", "company", "thesis", "catalyst", "grade", "stop",
     "target", "target-base", "target-bull", "timeframe", "notes", "date",
-    "no-push", "clear-reasons",
+    "no-push", "clear-reasons", ...PROJECTION_FLAGS, "horizon",
   ]),
   close: new Set(["id", "price", "date", "notes", "no-push"]),
   remove: new Set(["id", "no-push"]),
@@ -66,12 +79,16 @@ const USAGE = `Stock Bot pick CLI
   node scripts/pick.mjs add --ticker IONQ --company "IonQ" --price 45.10 \\
     --grade B --thesis "..." --catalyst "..." --stop 40 \\
     --target-base 70 --target-bull 110 --timeframe "3-6 months" \\
+    [--base-timeframe "3-6 months"] [--bull-timeframe "6-12 months"] \\
+    [--bull-case "the DOD contract is signed"] [--horizon swing|fast] \\
     --reason "Revenue +336% y/y" --source "Q3 release|https://example.com" \\
     --reason "Sector momentum"
 
   node scripts/pick.mjs update --id ID [--ticker T] [--price N] [--company "..."] \\
     [--thesis "..."] [--catalyst "..."] [--grade A|B|C|Lottery] [--stop N] \\
     [--target-base N] [--target-bull N] [--timeframe "..."] [--notes "..."] \\
+    [--base-timeframe "..."] [--bull-timeframe "..."] [--bull-case "..."] \\
+    [--horizon swing|fast] \\
     [--date YYYY-MM-DD] [--reason "..." [--source "Title|https://url"] ...] \\
     [--clear-reasons]
 
@@ -84,6 +101,11 @@ const USAGE = `Stock Bot pick CLI
 --target is an alias for --target-base. Repeat --reason to add several.
 Each --source attaches to the most recent --reason. Dates default to today
 in America/Los_Angeles. Grade defaults to B on add.
+--base-timeframe and --bull-timeframe override --timeframe for that case.
+--bull-case is the condition behind the bull target ("if ..."). On update,
+an empty value ("") clears any of these three.
+--horizon is "swing" (default, 3-12 months) or "fast" (about a day to a few
+weeks). Picks without it are swing unless the thesis starts with "Fast mover:".
 --no-push writes data/picks.json only (no pull, commit, or push).
 `;
 
@@ -125,6 +147,14 @@ function parseDate(raw, flag = "date") {
     throw new Error(`--${flag} must be a real calendar date`);
   }
   return s;
+}
+
+function parseHorizon(raw) {
+  const value = String(raw).trim().toLowerCase();
+  if (value !== "fast" && value !== "swing") {
+    throw new Error(`Invalid --horizon "${raw}" (use fast or swing)`);
+  }
+  return value;
 }
 
 function parseTicker(raw) {
@@ -311,6 +341,16 @@ function blankPick(fields) {
   };
 }
 
+function applyProjection(pick, flags) {
+  for (const [flag, field] of Object.entries(PROJECTION_FIELDS)) {
+    if (flags[flag] === undefined) continue;
+    const text = String(flags[flag]).trim();
+    if (text) pick[field] = text;
+    else delete pick[field];
+  }
+  return pick;
+}
+
 function buildAdd(flags, reasons) {
   const missing = ["ticker", "price", "thesis"].filter((name) => {
     return flags[name] === undefined || !String(flags[name]).trim();
@@ -320,7 +360,7 @@ function buildAdd(flags, reasons) {
   }
   const targets = resolveTargets(flags);
   const dateCalled = flags.date !== undefined ? parseDate(flags.date) : todayPT();
-  return blankPick({
+  const pick = blankPick({
     id: "",
     ticker: parseTicker(flags.ticker),
     company: flags.company !== undefined ? flags.company : "",
@@ -339,6 +379,9 @@ function buildAdd(flags, reasons) {
     notes: flags.notes !== undefined ? flags.notes : "",
     reasons,
   });
+  applyProjection(pick, flags);
+  if (flags.horizon !== undefined) pick.horizon = parseHorizon(flags.horizon);
+  return pick;
 }
 
 function syncTargetAlias(pick) {
@@ -367,6 +410,8 @@ function applyUpdate(pick, flags, reasons) {
     const timeframe = String(flags.timeframe).trim();
     pick.timeframe = timeframe || null;
   }
+  applyProjection(pick, flags);
+  if (flags.horizon !== undefined) pick.horizon = parseHorizon(flags.horizon);
   if (flags.notes !== undefined) pick.notes = flags.notes;
   if (flags.date !== undefined) pick.dateCalled = parseDate(flags.date);
   if (flags["clear-reasons"]) pick.reasons = [];
@@ -474,6 +519,7 @@ function main() {
     if (flags.grade !== undefined) parseGrade(flags.grade);
     if (flags.stop !== undefined) parsePositive("stop", flags.stop);
     if (flags.date !== undefined) parseDate(flags.date);
+    if (flags.horizon !== undefined) parseHorizon(flags.horizon);
     resolveTargets(flags);
     syncBeforeEdit(noPush);
     const doc = readDoc();
