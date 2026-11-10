@@ -218,68 +218,6 @@
       "bullCase": "If the FDA approves deramiocel on Nov 22 with a usable label and grants the rare pediatric priority review voucher (sellable for cash), and the NS Pharma distribution dispute gets resolved."
     },
     {
-      "id": "2026-11-09-QMCO",
-      "ticker": "QMCO",
-      "company": "Quantum Corp",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-10T02:54:32.697Z",
-      "priceAtCall": 19.95,
-      "thesis": "Fast mover: after-hours beat-and-raise. Revenue +43% y/y to $89.6M (est ~$82M), 2nd straight non-GAAP profit, record ~$100M backlog and one of its biggest-ever hyperscale tape orders. Up ~16-17% after hours to ~$19.95; next-open / day-2 follow-through setup toward the $24 50-day line and the $27-35 levels it held in October.",
-      "catalyst": "Fiscal Q2 2027 results Nov 9 after the close (8-K 1:12 PM PT): Q3 guide $91M +/- $2M vs ~$85.5M est, adj EPS $0.20 +/- 0.10. Next: reaction at the Nov 10 open.",
-      "grade": "B",
-      "stop": 17.9,
-      "target": 25,
-      "targetBase": 25,
-      "targetBull": 35,
-      "timeframe": "2 weeks to 3 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "Bought into the open = chasing; prefer a hold of the gap after the first 30 min or a pullback toward $18-19. Stock already ran +17.6% in Monday's regular session before results, so total move is ~+37% from Friday. Overhang: 10.6M PIPE shares registered for resale (Jul 2026). Firehose LATE rule: catalyst >15 min old; this is a next-open/day-2 play, not a chase.",
-      "reasons": [
-        {
-          "text": "Q2 revenue $89.6M, +42.9% y/y and +11% q/q; gross margin 41%; non-GAAP net income $9.8M ($0.25/sh); record backlog ~$100M; major hyperscale Scalar i7 Raptor order",
-          "sources": [
-            {
-              "title": "Quantum Q2 FY27 release (SEC 8-K Ex. 99.1)",
-              "url": "https://www.sec.gov/Archives/edgar/data/709283/000162828026072188/fy27q2ex991pressrelease.htm"
-            }
-          ]
-        },
-        {
-          "text": "Beat and guided above consensus: EPS $0.25 vs $0.13 est, sales $89.6M vs $82.3M; Q3 sales guide $89-93M vs $85.5M est",
-          "sources": [
-            {
-              "title": "Benzinga: Quantum sees Q3 sales above estimates",
-              "url": "https://www.benzinga.com/news/26/11/63069693/quantum-sees-q3-adj-eps-0-10-0-30-vs-0-12-est-sees-sales-89-000m-93-000m-vs-85-533m-est"
-            }
-          ]
-        },
-        {
-          "text": "Clean balance sheet now: $67.5M cash, no debt (was $55.9M term loan). Short interest ~9% of float (FINRA Oct 15), so not a squeeze story",
-          "sources": [
-            {
-              "title": "ChartExchange QMCO short interest",
-              "url": "https://chartexchange.com/symbol/nasdaq-qmco/short-interest/"
-            }
-          ]
-        },
-        {
-          "text": "Risk: 10.6M PIPE shares + 3.1M conversion shares registered for resale (selling overhang); warrants still outstanding; X chatter only ~3x normal (not crowded)",
-          "sources": [
-            {
-              "title": "Quantum resale prospectus 424B3 (Jul 2026)",
-              "url": "https://www.sec.gov/Archives/edgar/data/709283/000162828026049821/quantum-424b3july2026.htm"
-            }
-          ]
-        }
-      ],
-      "baseTimeframe": "2-4 weeks",
-      "bullTimeframe": "1-3 months",
-      "bullCase": "If it holds the after-hours gap above $17.90 through this week and the hyperscale tape order plus the ~$100M backlog turn into another beat-and-raise, taking it back to the $35.65 52-week high.",
-      "horizon": "fast"
-    },
-    {
       "id": "2026-11-09-SECZ",
       "ticker": "SECZ",
       "company": "Securitize Corp",
