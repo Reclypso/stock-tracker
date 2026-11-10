@@ -893,6 +893,66 @@
       "bullTimeframe": "2-3 months",
       "bullCase": "Recorlev keeps growing fast and more analysts lift targets toward the new $1B-by-2030 outlook",
       "horizon": "swing"
+    },
+    {
+      "id": "2026-11-10-CKX",
+      "ticker": "CKX",
+      "company": "CKX Lands",
+      "dateCalled": "2026-11-10",
+      "calledAt": "2026-11-10T17:44:27.759Z",
+      "priceAtCall": 18.06,
+      "thesis": "Brad Jacobs (founder of XPO and QXO) is putting $1B into this tiny $37M land company and will run it as his next build-up platform; with only about 2M shares outstanding, day-2 buying could squeeze it back toward yesterday's high.",
+      "catalyst": "Definitive $1B investment agreement with Jacobs Private Equity II (8-K + GlobeNewswire, Nov 9); holders also get a $10.13/share cash dividend before closing (early 2027)",
+      "grade": "C",
+      "stop": 14.5,
+      "target": 24,
+      "targetBase": 24,
+      "targetBull": 35,
+      "timeframe": "1-3 weeks",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Jacobs Private Equity II and co-investors agreed to invest $1B cash; Jacobs becomes chairman and CEO at closing",
+          "sources": [
+            {
+              "title": "GlobeNewswire release",
+              "url": "https://www.globenewswire.com/news-release/2026/11/09/3398171/0/en/brad-jacobs-to-lead-1-billion-equity-investment-in-ckx-lands.html"
+            },
+            {
+              "title": "8-K",
+              "url": "https://www.sec.gov/Archives/edgar/data/352955/000143774926035669/ckx20261109_8k.htm"
+            }
+          ]
+        },
+        {
+          "text": "Day 2 is holding: opened $16.70, low $14.57, now about $18 near the day high after Monday's run from $10.37 to a $24.74 high",
+          "sources": []
+        },
+        {
+          "text": "Cash cushion: $10.13 per share dividend to current holders before closing (needs shareholder vote; holders of about 28% already agreed to vote yes)",
+          "sources": [
+            {
+              "title": "Investment agreement",
+              "url": "https://www.sec.gov/Archives/edgar/data/352955/000143774926035972/ex_1040939.htm"
+            }
+          ]
+        },
+        {
+          "text": "Risk: Jacobs buys in at $1.09 per share pre-split and ends up with about 99.8%; at $18 the market is already paying a big premium for his name, so the hype can fade fast",
+          "sources": []
+        },
+        {
+          "text": "Crowded: X mentions jumped from about 0 a day to 439 on Nov 9 and 290 so far today",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "1-3 weeks",
+      "bullTimeframe": "1-3 months",
+      "bullCase": "a QXO-style rush into the Jacobs name on a tiny float",
+      "horizon": "fast"
     }
   ]
 }
