@@ -524,7 +524,7 @@ function animNum(key, value, fmt, text, cls = "", opts = {}) {
 
 function gradeBadge(grade) {
   const cls = GRADE_CLASS[grade] || "g-u";
-  const label = grade === "Lottery" ? "Lotto" : (grade || "—");
+  const label = grade || "—";
   return `<span class="badge ${cls}" title="Grade ${escapeHtml(grade || "none")}"><span class="sr-only">Grade </span>${escapeHtml(label)}</span>`;
 }
 
@@ -830,7 +830,7 @@ function renderLead(pick, ctx) {
         <div class="lead-id">
           <div class="ticker-line"><h3 class="ticker" id="${id}-t">${escapeHtml(pick.ticker)}</h3></div>
           ${company}
-          <div class="sum-tags">${typeBadge(pick)}${gradeBadge(pick.grade)}</div>
+          <div class="sum-tags">${typeBadge(pick)}${tradeTypeOf(pick).label === "Lottery" && pick.grade === "Lottery" ? "" : gradeBadge(pick.grade)}</div>
         </div>
         <div class="lead-now">
           <p class="now-v">${now}</p>
@@ -896,7 +896,7 @@ function renderArchived(pick, ctx) {
         <div class="lead-id">
           <div class="ticker-line"><h3 class="ticker" id="${id}-t">${escapeHtml(pick.ticker)}</h3></div>
           ${company}
-          <div class="sum-tags">${typeBadge(pick)}${gradeBadge(pick.grade)}<span class="tag-archived">Archived</span></div>
+          <div class="sum-tags">${typeBadge(pick)}${tradeTypeOf(pick).label === "Lottery" && pick.grade === "Lottery" ? "" : gradeBadge(pick.grade)}<span class="tag-archived">Archived</span></div>
         </div>
         <div class="lead-now">
           <p class="now-k">Closed at</p>
