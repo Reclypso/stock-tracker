@@ -1,101 +1,107 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 0.67,
-      "prevClose": 74.51,
-      "price": 75.01,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 6.08,
+      "prevClose": 74.31,
+      "price": 78.83,
+      "time": "2026-11-11T17:01:17Z"
     },
     "CAPR": {
-      "changePct": -4.21,
-      "prevClose": 9.26,
-      "price": 8.87,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 5.91,
+      "prevClose": 9.3,
+      "price": 9.8499,
+      "time": "2026-11-11T17:01:17Z"
+    },
+    "CARL": {
+      "changePct": 18.78,
+      "prevClose": 14.7,
+      "price": 17.46,
+      "time": "2026-11-11T17:01:17Z"
     },
     "CKX": {
-      "changePct": 4.23,
-      "prevClose": 17.24,
-      "price": 17.97,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": -4.15,
+      "prevClose": 16.6934,
+      "price": 16.0,
+      "time": "2026-11-11T17:01:17Z"
     },
     "FOSL": {
-      "changePct": -17.68,
-      "prevClose": 9.56,
-      "price": 7.87,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 4.81,
+      "prevClose": 9.46,
+      "price": 9.915,
+      "time": "2026-11-11T17:01:17Z"
     },
     "FROG": {
-      "changePct": -0.19,
-      "prevClose": 103.75,
-      "price": 103.55,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 8.07,
+      "prevClose": 103.0,
+      "price": 111.31,
+      "time": "2026-11-11T17:01:17Z"
     },
     "GDX": {
-      "changePct": -0.48,
-      "prevClose": 86.91,
-      "price": 86.49,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": -0.88,
+      "prevClose": 86.99,
+      "price": 86.225,
+      "time": "2026-11-11T17:01:17Z"
     },
     "IONQ": {
-      "changePct": -0.48,
-      "prevClose": 35.16,
-      "price": 34.99,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 0.29,
+      "prevClose": 34.66,
+      "price": 34.76,
+      "time": "2026-11-11T17:01:17Z"
     },
     "IREN": {
-      "changePct": -3.28,
-      "prevClose": 20.4,
-      "price": 19.73,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 4.73,
+      "prevClose": 20.3,
+      "price": 21.26,
+      "time": "2026-11-11T17:01:17Z"
     },
     "PYPD": {
-      "changePct": -6.24,
-      "prevClose": 6.73,
-      "price": 6.31,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 3.89,
+      "prevClose": 6.55,
+      "price": 6.805,
+      "time": "2026-11-11T17:01:17Z"
     },
     "SECZ": {
-      "changePct": -2.18,
-      "prevClose": 8.72,
-      "price": 8.53,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 8.25,
+      "prevClose": 8.61,
+      "price": 9.32,
+      "time": "2026-11-11T17:01:17Z"
     },
     "SERV": {
-      "changePct": -1.27,
-      "prevClose": 3.1499,
-      "price": 3.11,
-      "time": "2026-11-11T13:02:13Z"
+      "changePct": 3.37,
+      "prevClose": 3.12,
+      "price": 3.225,
+      "time": "2026-11-11T17:01:17Z"
     },
     "SVRA": {
-      "changePct": -1.01,
+      "changePct": 2.72,
       "prevClose": 4.97,
-      "price": 4.92,
-      "time": "2026-11-11T13:02:13Z"
+      "price": 5.105,
+      "time": "2026-11-11T17:01:17Z"
     },
     "URNM": {
-      "changePct": -2.57,
+      "changePct": -0.08,
       "prevClose": 42.88,
-      "price": 41.78,
-      "time": "2026-11-11T13:02:13Z"
+      "price": 42.845,
+      "time": "2026-11-11T17:01:17Z"
     },
     "VIR": {
-      "changePct": -0.0,
+      "changePct": -0.15,
       "prevClose": 13.15,
-      "price": 13.15,
-      "time": "2026-11-11T13:02:13Z"
+      "price": 13.13,
+      "time": "2026-11-11T17:01:17Z"
     },
     "XE": {
-      "changePct": -0.72,
+      "changePct": 0.9,
       "prevClose": 11.05,
-      "price": 10.97,
-      "time": "2026-11-11T13:02:13Z"
+      "price": 11.15,
+      "time": "2026-11-11T17:01:17Z"
     },
     "XERS": {
-      "changePct": 2.13,
+      "changePct": 5.74,
       "prevClose": 15.5,
-      "price": 15.83,
-      "time": "2026-11-11T13:02:13Z"
+      "price": 16.39,
+      "time": "2026-11-11T17:01:17Z"
     }
   },
-  "updated": "2026-11-11T13:02:13Z"
+  "updated": "2026-11-11T17:01:17Z"
 }
