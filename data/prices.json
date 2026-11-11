@@ -1,16 +1,16 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 2.5,
+      "changePct": 2.33,
       "prevClose": 74.31,
-      "price": 76.17,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 76.04,
+      "time": "2026-11-11T20:01:29Z"
     },
     "CAPR": {
-      "changePct": 17.69,
+      "changePct": 17.44,
       "prevClose": 9.3,
-      "price": 10.945,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 10.9218,
+      "time": "2026-11-11T20:01:29Z"
     },
     "CARL": {
       "changePct": 23.33,
@@ -31,28 +31,28 @@
       "time": "2026-11-11T20:00:53Z"
     },
     "FROG": {
-      "changePct": 6.31,
+      "changePct": 6.5,
       "prevClose": 103.0,
-      "price": 109.495,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 109.69,
+      "time": "2026-11-11T20:01:29Z"
     },
     "GDX": {
-      "changePct": -1.77,
+      "changePct": -1.72,
       "prevClose": 86.99,
-      "price": 85.45,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 85.49,
+      "time": "2026-11-11T20:01:29Z"
     },
     "IONQ": {
-      "changePct": -0.87,
+      "changePct": -0.75,
       "prevClose": 34.66,
-      "price": 34.36,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 34.4,
+      "time": "2026-11-11T20:01:29Z"
     },
     "IREN": {
-      "changePct": 3.94,
+      "changePct": 4.05,
       "prevClose": 20.3,
-      "price": 21.1,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 21.1214,
+      "time": "2026-11-11T20:01:29Z"
     },
     "PYPD": {
       "changePct": 0.91,
@@ -61,16 +61,16 @@
       "time": "2026-11-11T20:00:53Z"
     },
     "SECZ": {
-      "changePct": 7.08,
+      "changePct": 7.14,
       "prevClose": 8.61,
-      "price": 9.22,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 9.225,
+      "time": "2026-11-11T20:01:29Z"
     },
     "SERV": {
-      "changePct": 2.72,
+      "changePct": 2.88,
       "prevClose": 3.12,
-      "price": 3.205,
-      "time": "2026-11-11T19:55:14Z"
+      "price": 3.21,
+      "time": "2026-11-11T20:01:29Z"
     },
     "SVRA": {
       "changePct": 2.11,
@@ -79,10 +79,10 @@
       "time": "2026-11-11T20:00:53Z"
     },
     "URNM": {
-      "changePct": -0.82,
+      "changePct": -0.92,
       "prevClose": 42.88,
-      "price": 42.53,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 42.485,
+      "time": "2026-11-11T20:01:29Z"
     },
     "VIR": {
       "changePct": -0.61,
@@ -91,17 +91,17 @@
       "time": "2026-11-11T20:00:53Z"
     },
     "XE": {
-      "changePct": -0.41,
+      "changePct": -0.36,
       "prevClose": 11.05,
-      "price": 11.005,
-      "time": "2026-11-11T20:00:53Z"
+      "price": 11.01,
+      "time": "2026-11-11T20:01:29Z"
     },
     "XERS": {
-      "changePct": 4.97,
+      "changePct": 5.13,
       "prevClose": 15.5,
-      "price": 16.27,
-      "time": "2026-11-11T19:55:14Z"
+      "price": 16.295,
+      "time": "2026-11-11T20:01:29Z"
     }
   },
-  "updated": "2026-11-11T20:00:53Z"
+  "updated": "2026-11-11T20:01:29Z"
 }
