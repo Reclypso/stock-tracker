@@ -905,6 +905,59 @@
       "bullTimeframe": "1-3 months",
       "bullCase": "a QXO-style rush into the Jacobs name on a tiny float",
       "horizon": "fast"
+    },
+    {
+      "id": "2026-11-11-FOSL",
+      "ticker": "FOSL",
+      "company": "Fossil Group",
+      "dateCalled": "2026-11-11",
+      "calledAt": "2026-11-11T13:01:47.346Z",
+      "priceAtCall": 9.94,
+      "thesis": "Turnaround inflecting: surprise Q3 profit, gross margin up 10.8 points to 59.8%, full-year sales and margin guidance raised, and the stock is gapping to a new 52-week high from a Stage 2 uptrend (above rising 50- and 200-day averages). Classic beat-and-raise gap in a ~$465M small cap that can drift for weeks.",
+      "catalyst": "Q3 2026 results Nov 10 after the close (beat-and-raise); Nov 11 is day 1 of the post-earnings gap. Next check: holiday-quarter sales and Q4 report in early 2027.",
+      "grade": "B",
+      "stop": 8.9,
+      "target": 12.5,
+      "targetBase": 12.5,
+      "targetBull": 15,
+      "timeframe": "1-3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "Entry is the premarket print (~$9.94, Tuesday close $7.87). Don't chase a spike past ~$10.50; prefer it holding above the open after 30+ minutes or the first pullback that keeps the gap. Stop $8.90 (~10%) = back into the gap. Risks: sales were only +0.4% y/y, about $10M of wholesale shipments were pulled forward from Q4, interest costs doubled ($8.9M) on higher debt, and an ATM program from the Jan 2026 424B5 is still available (unused per management). Stock is already ~4x off its 52-week low.",
+      "reasons": [
+        {
+          "text": "Q3 net sales $271.2M vs ~$249M expected, operating income $25.3M vs a $21.7M loss a year ago, guidance raised to $980-990M",
+          "sources": [
+            {
+              "title": "Fossil Q3 2026 release (GlobeNewswire)",
+              "url": "https://www.globenewswire.com/news-release/2026/11/10/3400207/0/en/fossil-group-inc-reports-third-quarter-2026-financial-results.html"
+            }
+          ]
+        },
+        {
+          "text": "Now expects positive full-year net income and free cash flow; no ATM use so far",
+          "sources": [
+            {
+              "title": "Earnings call transcript (Investing.com)",
+              "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-fossil-beats-q3-2026-estimates-and-lifts-outlook-93CH-5017240"
+            }
+          ]
+        },
+        {
+          "text": "Up ~26% premarket to $9.94, above its prior 52-week high",
+          "sources": [
+            {
+              "title": "Benzinga premarket movers",
+              "url": "https://www.benzinga.com/trading-ideas/movers/26/11/63133304/why-fossil-group-shares-are-trading-higher-by-over-26-here-are-20-stocks-moving-premarket"
+            }
+          ]
+        }
+      ],
+      "baseTimeframe": "3-6 weeks",
+      "bullTimeframe": "2-3 months",
+      "bullCase": "the gap holds and holiday sales confirm positive full-year net income",
+      "horizon": "swing"
     }
   ]
 }
