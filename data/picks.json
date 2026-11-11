@@ -1046,6 +1046,72 @@
       "bullTimeframe": "2-3 months",
       "bullCase": "if the new bi-lateral lumbar system and the higher CMS inpatient payment keep growth near 50%+ and the first 2027 guidance beats, and no equity raise lands",
       "horizon": "swing"
+    },
+    {
+      "id": "2026-11-11-ANNX",
+      "ticker": "ANNX",
+      "company": "Annexon",
+      "dateCalled": "2026-11-11",
+      "calledAt": "2026-11-11T22:01:48.364Z",
+      "priceAtCall": 4.19,
+      "thesis": "Lottery: Annexon's eye drug vonaprument for geographic atrophy (a leading cause of blindness) has its big Phase 3 test, ARCHER II (659 patients), coming up: an independent data committee checks the Month-15 vision-loss endpoint in Q4 2026, which Wells Fargo expects between Thanksgiving and Christmas. Phase 2 showed a 14.2% gap vs sham; Wells Fargo says ARCHER II needs only about 5-6.6%, puts the odds at 55%, and sees a 3-4x re-rating on a win (target $27; named it its top biotech pick Nov 11). About $860M value at $4.19 including pre-funded warrants, with $213M cash and runway into 2028, so no raise is forced before the data. A 'keep going' verdict pushes the answer to Month 24 (Q3 2027) and the stock would likely drop hard.",
+      "catalyst": "ARCHER II Month-15 data-committee decision, Q4 2026 (expected late Nov to late Dec); if met, the two US sub-study results follow in Q1 2027. Tanruprubart (GBS) BLA filing also planned Q4 2026.",
+      "grade": "Lottery",
+      "stop": 3.6,
+      "target": 8.5,
+      "targetBase": 8.5,
+      "targetBull": 15,
+      "timeframe": "2 weeks to 3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 update (Nov 9): Month-15 primary endpoint assessment on track for Q4 2026, 90% retention, $213.4M cash, runway into 2028",
+          "sources": [
+            {
+              "title": "Annexon Q3 2026 release",
+              "url": "https://www.globenewswire.com/news-release/2026/11/09/3398918/0/en/annexon-reports-third-quarter-2026-financial-results-business-updates-and-key-anticipated-milestones.html"
+            }
+          ]
+        },
+        {
+          "text": "Wells Fargo top biotech pick (Nov 11): 55% odds of a Month-15 win, 3-4x re-rating potential, $27 target, decision expected between Thanksgiving and Christmas",
+          "sources": [
+            {
+              "title": "Investing.com: Wells Fargo names top pick",
+              "url": "https://www.investing.com/news/stock-market-news/wells-fargo-names-top-pick-in-biotechnology-sector-5019506"
+            }
+          ]
+        },
+        {
+          "text": "Trial design: 659 patients, 2:1 drug vs sham, powered over 90%; Phase 2 showed 73% risk reduction in 15-letter vision loss at the monthly dose",
+          "sources": [
+            {
+              "title": "Annexon investor call deck (Nov 3)",
+              "url": "https://annexonbiosciences.gcs-web.com/static-files/e55e4d2a-22d8-43a8-bf8c-6449df3a261b"
+            }
+          ]
+        },
+        {
+          "text": "Dilution check: active $150M at-the-market program ($37.5M sold so far) and a $50M Oxford loan; 190.8M shares plus 14.7M pre-funded warrants",
+          "sources": [
+            {
+              "title": "Annexon 10-Q (Q3 2026)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1528115/000119312526453585/annx-20260930.htm"
+            }
+          ]
+        },
+        {
+          "text": "Risk: a 'continue to Month 24' verdict or a miss would likely cut the stock 40-60%+ overnight, gapping past the stop. Liquid: about 3.4M shares/day. X chatter spiked on the Nov 5 trial update, not a promotion",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "on the Q4 2026 data-committee decision (late Nov to Dec)",
+      "bullTimeframe": "1-3 months (Q1 2027 sub-study results)",
+      "bullCase": "the data committee says ARCHER II met its Month-15 endpoint (expected late Nov to Dec 2026) and the Q1 2027 US sub-studies confirm it",
+      "horizon": "swing"
     }
   ]
 }
