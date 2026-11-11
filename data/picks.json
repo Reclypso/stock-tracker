@@ -908,6 +908,15 @@
         {
           "text": "Crowded: X mentions jumped from about 0 a day to 439 on Nov 9 and 290 so far today",
           "sources": []
+        },
+        {
+          "text": "Nov 11: -13% intraday to ~$15.55 (stop $14.50) as the Brad Jacobs $1B-investment pop fades; an M&A shareholder-rights firm opened an investigation into the deal terms (reverse split + share issuance). Watch the close vs. the stop.",
+          "sources": [
+            {
+              "title": "Monteverde investigation PR",
+              "url": "https://www.prnewswire.com/news-releases/hareholder-alert-the-ma-class-action-firm-announces-an-investigation-of-ckx-lands-inc-nyse-american-ckx-302935017.html"
+            }
+          ]
         }
       ],
       "baseTimeframe": "1-3 weeks",
