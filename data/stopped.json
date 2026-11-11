@@ -1,3 +1,57 @@
 {
-  "stopped": []
+  "stopped": [
+    {
+      "stoppedDate": "2026-11-10",
+      "closePrice": 4.61,
+      "returnPct": -22.78,
+      "pick": {
+        "id": "2026-11-10-PEPG",
+        "ticker": "PEPG",
+        "company": "PepGen",
+        "dateCalled": "2026-11-10",
+        "calledAt": "2026-11-10T15:36:42.819Z",
+        "priceAtCall": 5.97,
+        "thesis": "Fast mover: day-1 hold after best-in-class DM1 splicing data; ~$415M cap vs multi-billion DM1 peers, crowded and already +130%.",
+        "catalyst": "Positive Phase 2 FREEDOM2-DM1 10 mg/kg data (Nov 10): 46.5% mean splicing correction vs 6.8% placebo, functional gains, no SAEs",
+        "grade": "C",
+        "stop": 5.1,
+        "target": 8,
+        "targetBase": 8,
+        "targetBull": 12,
+        "timeframe": "1 day-3 weeks",
+        "status": "open",
+        "exitDate": null,
+        "exitPrice": null,
+        "notes": "Gap rule: cap >$300M and holding above open after 60 min; dilution check: no S-3/424B in 90 days but shelf declared effective May 2026.",
+        "reasons": [
+          {
+            "text": "Primary 8-K: highest splicing correction reported in a multiple-dose DM1 study, 5 of 6 patients >20%",
+            "sources": [
+              {
+                "title": "PEPG 8-K",
+                "url": "https://www.sec.gov/Archives/edgar/data/1835597/000119312526454469/pepg-20261110.htm"
+              }
+            ]
+          },
+          {
+            "text": "Funded into 2028 ($104.8M cash) and holding above its $5.55 open an hour into the session",
+            "sources": [
+              {
+                "title": "Q3 release (Business Wire)",
+                "url": "https://www.businesswire.com/news/home/20261110685903/en/PepGen-Reports-Third-Quarter-2026-Financial-Results-and-Recent-Corporate-Highlights"
+              }
+            ]
+          },
+          {
+            "text": "Risk: already +130%, X mentions ~18x normal (crowded/late), and an effective shelf makes a follow-on offering likely",
+            "sources": []
+          }
+        ],
+        "baseTimeframe": "1-3 weeks",
+        "bullTimeframe": "1-3 months",
+        "bullCase": "analyst upgrades and partner/buyout interest re-rate it toward DM1 peers (Novartis paid ~$12B for Avidity in 2025)",
+        "horizon": "fast"
+      }
+    }
+  ]
 }
