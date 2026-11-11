@@ -711,6 +711,15 @@
         {
           "text": "Risk: miners have lagged the commodity for months; risk-off selling and policy changes after the midterms hit nuclear names; Sprott trust hasn't bought uranium since July",
           "sources": []
+        },
+        {
+          "text": "Nov 11: Bloomberg reports CME is close to launching a physically backed uranium futures contract (storage deal with ConverDyn expected by year-end, not guaranteed), a sign of deeper market access for uranium; URNM ~$42.4, still below its 50-day (~$47)",
+          "sources": [
+            {
+              "title": "Bloomberg: CME pursues physical uranium contracts",
+              "url": "https://news.bloomberglaw.com/environment-and-energy/nuclear-revival-spurs-cme-to-pursue-physical-uranium-contracts"
+            }
+          ]
         }
       ],
       "baseTimeframe": "3-6 months",
