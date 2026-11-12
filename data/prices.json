@@ -31,10 +31,10 @@
       "time": "2026-11-12T22:02:56Z"
     },
     "DCTH": {
-      "changePct": -3.48,
-      "prevClose": 22.15,
+      "changePct": -4.51,
+      "prevClose": 22.39,
       "price": 21.38,
-      "time": "2026-11-12T22:02:56Z"
+      "time": "2026-11-12T23:05:17Z"
     },
     "FIGR": {
       "changePct": 6.51,
@@ -84,6 +84,12 @@
       "price": 7.72,
       "time": "2026-11-12T22:02:56Z"
     },
+    "TMDX": {
+      "changePct": 0.7,
+      "prevClose": 91.3597,
+      "price": 92.0,
+      "time": "2026-11-12T23:05:17Z"
+    },
     "URNM": {
       "changePct": -4.21,
       "prevClose": 42.0419,
@@ -103,5 +109,5 @@
       "time": "2026-11-12T22:02:56Z"
     }
   },
-  "updated": "2026-11-12T22:03:07Z"
+  "updated": "2026-11-12T23:05:17Z"
 }
