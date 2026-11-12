@@ -1103,6 +1103,67 @@
       "bullTimeframe": "1-3 months after a win (squeeze plus BLA plans)",
       "bullCase": "REGAL shows a statistically significant overall-survival win when topline is released (expected by Nov 30, 2026)",
       "horizon": "fast"
+    },
+    {
+      "id": "2026-11-12-TMDX",
+      "ticker": "TMDX",
+      "company": "TransMedics Group",
+      "dateCalled": "2026-11-12",
+      "calledAt": "2026-11-12T23:04:50.615Z",
+      "priceAtCall": 92.02,
+      "thesis": "Medium-term: post-earnings drift. TransMedics posted record Q3 revenue (+41%, profitable) and raised its FY guide; the Nov 6 gap from $69 to $88 has held for 5 sessions in a tight $89-97 range right at the 200-day line, with about 40% of the float short. Graded C, not B: it already ran about 33%, carries about $867M of debt vs $493M cash, there is no hard dated catalyst, and the tape is weak.",
+      "catalyst": "Q3 beat-and-raise (Nov 5) holding its gap; analyst target raises to $110-120; ENHANCE Heart Part B / DENOVO Lung IDE approvals and first European logistics win; heavy short interest",
+      "grade": "C",
+      "stop": 85.5,
+      "target": 110,
+      "targetBase": 110,
+      "targetBull": 125,
+      "timeframe": "2 weeks-3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 revenue $203.0M, up 41% (organic 35%); net income $17.1M; FY2026 revenue guide raised to $764-774M",
+          "sources": [
+            {
+              "title": "TransMedics Q3 2026 release (SEC 8-K Ex 99.1)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1756262/000119312526449729/tmdx-ex99_1.htm"
+            }
+          ]
+        },
+        {
+          "text": "Gap held: closed $68.91 before earnings, opened $79.12 and closed $88.22 on Nov 6, and has stayed between $88.83 and $97.26 since (IEX daily bars); stop sits under the Nov 10 low",
+          "sources": []
+        },
+        {
+          "text": "Analysts raised targets after the print: Needham $110 (Buy), Canaccord $120 (Buy), UBS $88 (Neutral)",
+          "sources": [
+            {
+              "title": "Benzinga via Alpaca news, Nov 6-9 2026",
+              "url": "https://www.benzinga.com/quote/TMDX"
+            }
+          ]
+        },
+        {
+          "text": "Short interest about 40% of float and analyst high target $125 (Yahoo Finance data)",
+          "sources": [
+            {
+              "title": "Yahoo Finance TMDX",
+              "url": "https://finance.yahoo.com/quote/TMDX/"
+            }
+          ]
+        },
+        {
+          "text": "Risks: no new S-3/424B filings since July, but net debt (convertible notes); stock was $156 at its 52-week high, so supply overhead; weak AI-led tape",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "1-2 months",
+      "bullTimeframe": "2-3 months",
+      "bullCase": "if the gap keeps holding and shorts (about 40% of float) cover into new trial-enrollment or Europe launch news",
+      "horizon": "swing"
     }
   ]
 }
