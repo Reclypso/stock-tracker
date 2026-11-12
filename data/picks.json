@@ -1322,6 +1322,67 @@
       "bullTimeframe": "2-3 months",
       "bullCase": "if new Xacta/government awards keep landing and TSA PreCheck volumes keep Q4 at the top of its guide, re-rating it toward B. Riley's $11 target",
       "horizon": "swing"
+    },
+    {
+      "id": "2026-11-12-SLS",
+      "ticker": "SLS",
+      "company": "SELLAS Life Sciences",
+      "dateCalled": "2026-11-12",
+      "calledAt": "2026-11-12T22:02:28.266Z",
+      "priceAtCall": 8.03,
+      "thesis": "Lottery: SELLAS says topline results from its Phase 3 REGAL trial of galinpepimut-S (a WT1 cancer vaccine given as maintenance to AML patients in second remission) come out this month, after the final 80th-death analysis was triggered in October. It's a pure yes/no event on overall survival. The stock fell from about $15 to $8 (about $1.6B value) going into the data, and about 28% of shares are sold short with little stock left to borrow, so a clear win could force a squeeze toward analyst targets of $30-35. A miss would likely send it back toward $1-2, the price it traded at a year ago. Small bet only.",
+      "catalyst": "REGAL Phase 3 topline (primary endpoint: overall survival), company says November 2026; SLS009 Phase 2 data at ASH Dec 12-15",
+      "grade": "Lottery",
+      "stop": 6.8,
+      "target": 15,
+      "targetBase": 15,
+      "targetBull": 25,
+      "timeframe": "1 day to 3 months",
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 update (Nov 12): REGAL topline primary-endpoint results expected this month after the 80th event; $134.7M cash",
+          "sources": [
+            {
+              "title": "SELLAS Q3 2026 release",
+              "url": "https://www.globenewswire.com/news-release/2026/11/12/3402212/0/en/sellas-life-sciences-reports-third-quarter-2026-financial-results-and-provides-corporate-update.html"
+            }
+          ]
+        },
+        {
+          "text": "Dilution check: no going-concern doubt, cash covers 12+ months, operating burn only $22.4M in 9 months; a $150M TD Cowen ATM from March 2026 is unused (expect it to be used after good data). No 424B or S-1 in the last 90 days. Share count has more than tripled in 2 years via warrant exercises",
+          "sources": [
+            {
+              "title": "SELLAS 10-Q (Q3 2026)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1390478/000139047826000020/sls-20260930.htm"
+            }
+          ]
+        },
+        {
+          "text": "Squeeze fuel: 57.1M shares short (28.3% of shares out) at the Oct 30 settlement, only about 65K shares available to borrow; 2 analysts rate it Buy with $30-35 targets",
+          "sources": [
+            {
+              "title": "CurvedTrading SLS short interest",
+              "url": "https://curvedtrading.com/stocks/sls/"
+            },
+            {
+              "title": "Nexqual SLS analyst data",
+              "url": "https://nexqual.com/SLS"
+            }
+          ]
+        },
+        {
+          "text": "Risks: open-label trial (patients know their arm), single-asset binary, already 5x off last year's low, and a miss or 'not significant' result would likely gap far past the stop. Liquid: about 6.9M shares/day. X chatter steady (75-214 posts/day), no spike or promotion",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "on the REGAL topline release (expected by Nov 30, 2026)",
+      "bullTimeframe": "1-3 months after a win (squeeze plus BLA plans)",
+      "bullCase": "REGAL shows a statistically significant overall-survival win when topline is released (expected by Nov 30, 2026)",
+      "horizon": "fast"
     }
   ]
 }
