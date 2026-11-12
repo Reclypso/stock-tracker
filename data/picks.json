@@ -1,58 +1,6 @@
 {
   "picks": [
     {
-      "id": "2026-11-09-IONQ",
-      "ticker": "IONQ",
-      "company": "IonQ",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-09T21:35:04.611Z",
-      "priceAtCall": 35.34,
-      "thesis": "Biggest pure-play quantum name just posted a record beat-and-raise; post-earnings gap is holding and the stock is still half its 6-month high, so the drift can carry it back toward $50-72.",
-      "catalyst": "Q3 beat-and-raise (Nov 5): revenue $173.8M (+336% y/y), FY26 guide raised to $505-515M, backlog $1.2B. Follow-through: Rigetti/D-Wave prints Nov 10 can extend the sector move.",
-      "grade": "B",
-      "stop": 31.5,
-      "target": 50,
-      "targetBase": 50,
-      "targetBull": 72,
-      "timeframe": "3-6 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "",
-      "reasons": [
-        {
-          "text": "Record Q3 revenue $173.8M (+336% y/y), FY2026 guidance raised to $505-515M, backlog more than doubled to $1.2B",
-          "sources": [
-            {
-              "title": "IonQ Q3 2026 press release",
-              "url": "https://investors.ionq.com/news/news-details/2026/IonQ-Announces-Record-3Q26-Revenues-and-Raises-FY2026-Guidance-to-505---515-Million-as-Backlog-Grows-to-1-2-Billion/default.aspx"
-            }
-          ]
-        },
-        {
-          "text": "Stock gapped +23% on Nov 6 and added +8% on Nov 9; 2027 Superion capacity described as sold out. Risk: $83.5M of revenue came from the SkyWater acquisition and adj. EBITDA loss was $133.6M",
-          "sources": [
-            {
-              "title": "24/7 Wall St., Nov 9 2026",
-              "url": "https://247wallst.com/investing/2026/11/09/ionq-jumps-8-as-raised-revenue-outlook-extends-quantum-rally-rigetti-surges-8-d-wave-rises-6/"
-            }
-          ]
-        },
-        {
-          "text": "Management commentary on demand and the $2B equity raise (cash to keep investing)",
-          "sources": [
-            {
-              "title": "IonQ Q3 2026 earnings call transcript",
-              "url": "https://www.fool.com/earnings/call-transcripts/2026/11/06/ionq-ionq-q3-2026-earnings-call-transcript/"
-            }
-          ]
-        }
-      ],
-      "baseTimeframe": "2-4 months",
-      "bullTimeframe": "4-8 months",
-      "bullCase": "If IonQ announces a new large system or government deal, or its Q4 report (late Feb 2027) beats the raised $505-515M guide and gives a 2027 outlook well above consensus while the quantum theme stays hot."
-    },
-    {
       "id": "2026-11-09-IREN",
       "ticker": "IREN",
       "company": "IREN Ltd",
@@ -103,58 +51,6 @@
       "baseTimeframe": "3-4 months (after the Jan 2027 go-live)",
       "bullTimeframe": "6-9 months",
       "bullCase": "If Microsoft Horizon 2-4 capacity goes live on schedule by Jan 31, 2027 AND the remaining ~$6B of targeted capex financing gets committed (or IREN signs another hyperscaler/frontier-lab contract)."
-    },
-    {
-      "id": "2026-11-09-SERV",
-      "ticker": "SERV",
-      "company": "Serve Robotics",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-09T21:35:04.713Z",
-      "priceAtCall": 3.39,
-      "thesis": "Small robotics name (~$300M cap, ~$198M cash) gapped +39% on a guidance raise and held it; AI/robotics heat plus a new Physical AI Services revenue line could re-rate it toward its $9 high.",
-      "catalyst": "Q3 beat and FY26 revenue guide raised to $12M (Nov 5), Physical AI Services launch, Australia expansion; Q4 delivery-volume updates and new partner announcements.",
-      "grade": "C",
-      "stop": 2.95,
-      "target": 5.5,
-      "targetBase": 5.5,
-      "targetBull": 9,
-      "timeframe": "3-6 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "",
-      "reasons": [
-        {
-          "text": "Q3 revenue $2.8M (+313% y/y), FY26 guide raised to $12M from $9-10M, opex guide cut to $150M, $198M cash and securities",
-          "sources": [
-            {
-              "title": "Serve Robotics Q3 2026 release",
-              "url": "https://investors.serverobotics.com/news-releases/news-release-details/serve-robotics-announces-third-quarter-2026-results"
-            }
-          ]
-        },
-        {
-          "text": "New Physical AI Services line opens its fleet data/tech to other robot makers",
-          "sources": [
-            {
-              "title": "Serve Robotics press release, Nov 5 2026",
-              "url": "https://investors.serverobotics.com/news-releases/news-release-details/serve-robotics-launches-physical-ai-services-opening-technology"
-            }
-          ]
-        },
-        {
-          "text": "Stock jumped ~39% on Nov 6 and held the gap Nov 9. Main risk: burns ~$40M/quarter and uses ATM offerings (dilution)",
-          "sources": [
-            {
-              "title": "Zintick, Nov 6 2026",
-              "url": "https://zintick.com/news/serve-robotics-serv-stock-up-q3-results-and-raised-guidance-2026-11-06"
-            }
-          ]
-        }
-      ],
-      "baseTimeframe": "2-4 months",
-      "bullTimeframe": "6-12 months",
-      "bullCase": "If Serve signs a major new delivery-platform or robot-maker customer for Physical AI Services (or a large hospital-robot deal) and its 2027 guidance shows revenue scaling well past the $12M 2026 level."
     },
     {
       "id": "2026-11-09-CAPR",
@@ -355,72 +251,6 @@
       "horizon": "swing"
     },
     {
-      "id": "2026-11-09-VIR",
-      "ticker": "VIR",
-      "company": "Vir Biotechnology",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-10T04:14:32.118Z",
-      "priceAtCall": 13.65,
-      "thesis": "Medium-term: Vir's two-drug hepatitis delta regimen (monthly shots) hit its Phase 3 ECLIPSE 1 goals on Nov 8: 44% reached undetectable virus plus normal liver enzymes vs 0% on delayed treatment, 79% undetectable virus, clean safety. The stock rose only ~12% to a new 52-week high of $13.65 on 3.7x volume. Hepatitis delta is the most severe form of viral hepatitis with few treatment options; ECLIPSE 2/3 data come in Q1 2027 and an FDA filing is planned for mid-2027. ~$900M cash vs ~$2.3B market cap.",
-      "catalyst": "ECLIPSE 1 Phase 3 win (AASLD, Nov 8); ECLIPSE 2 and 3 topline Q1 2027; US filing mid-2027; masked T-cell engager deals with Astellas and Gilead.",
-      "grade": "B",
-      "stop": 12.2,
-      "target": 17,
-      "targetBase": 17,
-      "targetBull": 22,
-      "timeframe": "1-4 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "Stop $12.20 = back under Friday's close (gap fill). Analyst targets: HC Wainwright $22, Needham $20. Cash runway 12+ months per the 10-Q, so no forced raise near term, but biotech can sell into strength.",
-      "reasons": [
-        {
-          "text": "Phase 3 ECLIPSE 1 met primary and key secondary endpoints: 44.1% HDV RNA undetectable + ALT normal vs 0%; 79.2% undetectable at week 48; no discontinuations",
-          "sources": [
-            {
-              "title": "Benzinga: Vir ECLIPSE 1 meets primary endpoint",
-              "url": "https://www.benzinga.com/news/26/11/63022869/reported-sunday-vir-s-elebsiran-and-tobevibart-meet-primary-endpoint-phase-3-eclipse-1-hepatitis-del"
-            }
-          ]
-        },
-        {
-          "text": "Primary filing: 8-K items 7.01/8.01 with the ECLIPSE 1 data (Nov 9)",
-          "sources": [
-            {
-              "title": "SEC 8-K (Vir)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1706431/000162828026071908/vir-20261108.htm"
-            }
-          ]
-        },
-        {
-          "text": "ECLIPSE 2/3 data expected Q1 2027, US filing mid-2027; shares up ~15% to a 52-week high on the news",
-          "sources": [
-            {
-              "title": "Benzinga: Vir highlights viral suppression in advanced liver disease",
-              "url": "https://www.benzinga.com/trading-ideas/movers/26/11/63039953/vir-biotech-highlights-significant-viral-suppression-in-advanced-liver-disease-study"
-            }
-          ]
-        },
-        {
-          "text": "About $901M cash and investments at Sept 30, 2026 (runway 12+ months per 10-Q); HC Wainwright Buy, $22 target",
-          "sources": [
-            {
-              "title": "HC Wainwright reiterates Buy, $22 PT",
-              "url": "https://www.benzinga.com/news/26/11/63049718/hc-wainwright-co-reiterates-buy-vir-biotechnology-maintains-22-price-target"
-            }
-          ]
-        },
-        {
-          "text": "Risk: still loss-making; Gilead's bulevirtide and other hep-delta drugs compete; a 44% combined response may be judged modest; ECLIPSE 2/3 could disappoint",
-          "sources": []
-        }
-      ],
-      "baseTimeframe": "4-10 weeks",
-      "bullTimeframe": "2-4 months",
-      "bullCase": "ECLIPSE 2/3 read out positive in Q1 2027 and the market starts pricing a first US hep-delta approval",
-      "horizon": "swing"
-    },
-    {
       "id": "2026-11-09-XE",
       "ticker": "XE",
       "company": "X-Energy",
@@ -603,63 +433,6 @@
       "bullTimeframe": "1-3 months",
       "bullCase": "the FDA approves on time with a broad label and the UK approval follows in Q4",
       "horizon": "fast"
-    },
-    {
-      "id": "2026-11-09-GDX",
-      "ticker": "GDX",
-      "company": "VanEck Gold Miners ETF",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-10T04:15:25.049Z",
-      "priceAtCall": 91.46,
-      "thesis": "Macro (long-term): gold miners as a long-term hold on central-bank gold buying. Official buyers added 321 tonnes in Q3 (+42% y/y, the most since Q4 2024), yet gold (~$4,130) is still ~26% below its January record and GDX is ~22% under its March high. Miners earn huge margins at these prices (Barrick's Q3 adj EPS +41% y/y), and miners move about 2-3x gold. GDX just reclaimed its 50- and 200-day averages (+15% in a week). Short-term chance: a pullback after Tuesday's CPI is a better add point.",
-      "catalyst": "Q3 central-bank buying (WGC); October CPI Tue Nov 10; Fed meeting Dec 8-9 (~80% odds of a hike); Iran war/peace headlines; miner Q3 earnings this week.",
-      "grade": "B",
-      "stop": 82,
-      "target": 110,
-      "targetBase": 110,
-      "targetBull": 125,
-      "timeframe": "3-12 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "Plain 1x ETF, no decay, fine to hold for months. Stop $82 is ~10% down (under last week's lows, back below the 50/200-day). Headwinds: Fed still hiking and 10-year ~4.9%; a peace deal can cut the safe-haven bid. If you want a short-term amplified version, NUGT/JNUG are 2x-3x but only for days, not months.",
-      "reasons": [
-        {
-          "text": "Central banks added 321t in Q3 (+42% y/y), 675t in 9 months (+6%); China and Poland led disclosed buying",
-          "sources": [
-            {
-              "title": "Kitco/Heraeus: gold, silver extend rebound; central banks on pace",
-              "url": "https://www.kitco.com/news/article/2026-11-09/gold-and-silver-prices-extend-post-election-rebound-central-banks-pace-beat"
-            }
-          ]
-        },
-        {
-          "text": "Gold ~$4,126-4,140 on Nov 9, ~26% below January's record; GDX +3.8% Monday vs gold +1.3%; Barrick Q3 adj EPS $0.82 (+41% y/y)",
-          "sources": [
-            {
-              "title": "TradingNews: gold clears $4,100",
-              "url": "https://www.tradingnews.com/news/gold-4216-usd-rallies-through-rising-yeilds-on-oil-collapse-4300-usd"
-            }
-          ]
-        },
-        {
-          "text": "Weaker dollar and falling oil supported metals; but futures price ~82% odds of a December hike",
-          "sources": [
-            {
-              "title": "Kitco PM report Nov 9",
-              "url": "https://www.kitco.com/news/article/2026-11-09/gold-silver-advance-dollar-weakens-fed-rate-expectations-face-inflation"
-            }
-          ]
-        },
-        {
-          "text": "Risk: rate hikes and a strong dollar; miners can fall 30%+ in a gold correction (GDX hit $69.74 in July)",
-          "sources": []
-        }
-      ],
-      "baseTimeframe": "3-6 months",
-      "bullTimeframe": "6-12 months",
-      "bullCase": "gold breaks back above $5,000 toward its January record as central banks keep buying and the Fed stops hiking",
-      "horizon": "swing"
     },
     {
       "id": "2026-11-09-URNM",
@@ -932,59 +705,6 @@
       "bullTimeframe": "1-3 months",
       "bullCase": "a QXO-style rush into the Jacobs name on a tiny float",
       "horizon": "fast"
-    },
-    {
-      "id": "2026-11-11-FOSL",
-      "ticker": "FOSL",
-      "company": "Fossil Group",
-      "dateCalled": "2026-11-11",
-      "calledAt": "2026-11-11T13:01:47.346Z",
-      "priceAtCall": 9.94,
-      "thesis": "Turnaround inflecting: surprise Q3 profit, gross margin up 10.8 points to 59.8%, full-year sales and margin guidance raised, and the stock is gapping to a new 52-week high from a Stage 2 uptrend (above rising 50- and 200-day averages). Classic beat-and-raise gap in a ~$465M small cap that can drift for weeks.",
-      "catalyst": "Q3 2026 results Nov 10 after the close (beat-and-raise); Nov 11 is day 1 of the post-earnings gap. Next check: holiday-quarter sales and Q4 report in early 2027.",
-      "grade": "B",
-      "stop": 8.9,
-      "target": 12.5,
-      "targetBase": 12.5,
-      "targetBull": 15,
-      "timeframe": "1-3 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "Entry is the premarket print (~$9.94, Tuesday close $7.87). Don't chase a spike past ~$10.50; prefer it holding above the open after 30+ minutes or the first pullback that keeps the gap. Stop $8.90 (~10%) = back into the gap. Risks: sales were only +0.4% y/y, about $10M of wholesale shipments were pulled forward from Q4, interest costs doubled ($8.9M) on higher debt, and an ATM program from the Jan 2026 424B5 is still available (unused per management). Stock is already ~4x off its 52-week low.",
-      "reasons": [
-        {
-          "text": "Q3 net sales $271.2M vs ~$249M expected, operating income $25.3M vs a $21.7M loss a year ago, guidance raised to $980-990M",
-          "sources": [
-            {
-              "title": "Fossil Q3 2026 release (GlobeNewswire)",
-              "url": "https://www.globenewswire.com/news-release/2026/11/10/3400207/0/en/fossil-group-inc-reports-third-quarter-2026-financial-results.html"
-            }
-          ]
-        },
-        {
-          "text": "Now expects positive full-year net income and free cash flow; no ATM use so far",
-          "sources": [
-            {
-              "title": "Earnings call transcript (Investing.com)",
-              "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-fossil-beats-q3-2026-estimates-and-lifts-outlook-93CH-5017240"
-            }
-          ]
-        },
-        {
-          "text": "Up ~26% premarket to $9.94, above its prior 52-week high",
-          "sources": [
-            {
-              "title": "Benzinga premarket movers",
-              "url": "https://www.benzinga.com/trading-ideas/movers/26/11/63133304/why-fossil-group-shares-are-trading-higher-by-over-26-here-are-20-stocks-moving-premarket"
-            }
-          ]
-        }
-      ],
-      "baseTimeframe": "3-6 weeks",
-      "bullTimeframe": "2-3 months",
-      "bullCase": "the gap holds and holiday sales confirm positive full-year net income",
-      "horizon": "swing"
     },
     {
       "id": "2026-11-11-CARL",
