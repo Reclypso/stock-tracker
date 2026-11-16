@@ -1,58 +1,6 @@
 {
   "picks": [
     {
-      "id": "2026-11-09-IREN",
-      "ticker": "IREN",
-      "company": "IREN Ltd",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-09T21:35:04.663Z",
-      "priceAtCall": 21.41,
-      "thesis": "AI-cloud operator crushed 65% in a year on financing fears, but revenue is ramping fast and >$4B of contracted, funded ARR goes live Jan-Feb 2027; a relief re-rating toward analyst targets ($30-65) could double it.",
-      "catalyst": "Microsoft Horizon 2-4 capacity (>$4B contracted ARR) targeted to go live by Jan 31, 2027 (may slip to Feb). Next earnings ~early Feb 2027.",
-      "grade": "C",
-      "stop": 17,
-      "target": 35,
-      "targetBase": 35,
-      "targetBull": 55,
-      "timeframe": "3-6 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "",
-      "reasons": [
-        {
-          "text": "Q1 FY27 revenue $228M (+66% q/q), AI Cloud revenue $200M (+182% q/q) at 86% gross margin, backlog $20.3B, new contracts signed after quarter end",
-          "sources": [
-            {
-              "title": "CNBC, Nov 5 2026",
-              "url": "https://www.cnbc.com/2026/11/05/iren-earnings-report-q1-2027-.html"
-            }
-          ]
-        },
-        {
-          "text": "Analysts cut targets on the delay but still see big upside: Cantor $47 (Overweight), Macquarie $55, BTIG $65, Goldman $30 (Neutral)",
-          "sources": [
-            {
-              "title": "Yahoo Finance, Nov 9 2026",
-              "url": "https://finance.yahoo.com/markets/stocks/articles/cantor-cuts-iren-price-target-150136747.html"
-            }
-          ]
-        },
-        {
-          "text": "Main risk: heavy debt (~$10B) and $6B of FY27 capex financing still 'targeted', not committed; stock is in a Stage 4 downtrend, so this is a speculative rebound",
-          "sources": [
-            {
-              "title": "IREN Q1 FY27 results",
-              "url": "https://iren.gcs-web.com/news-releases/news-release-details/iren-reports-q1-fy27-results"
-            }
-          ]
-        }
-      ],
-      "baseTimeframe": "3-4 months (after the Jan 2027 go-live)",
-      "bullTimeframe": "6-9 months",
-      "bullCase": "If Microsoft Horizon 2-4 capacity goes live on schedule by Jan 31, 2027 AND the remaining ~$6B of targeted capex financing gets committed (or IREN signs another hyperscaler/frontier-lab contract)."
-    },
-    {
       "id": "2026-11-09-CAPR",
       "ticker": "CAPR",
       "company": "Capricor Therapeutics",
@@ -435,72 +383,6 @@
       "horizon": "fast"
     },
     {
-      "id": "2026-11-09-URNM",
-      "ticker": "URNM",
-      "company": "Sprott Uranium Miners ETF",
-      "dateCalled": "2026-11-09",
-      "calledAt": "2026-11-10T04:15:25.095Z",
-      "priceAtCall": 43.9,
-      "thesis": "Macro (long-term): uranium miners are down ~48% from January while the uranium contract price hit a record. Long-term contract price ~$97-99/lb (TradeTech/UxC, Oct 31), the highest since the 2000s, with spot ~$92. Utilities still have to sign years of supply and new mines are hard to finance, so miners that haven't sold their 2030s output should re-rate when the theme turns. URNM holds the miners plus Sprott's physical uranium trust. This is a buy-the-gap between the stocks and the commodity, not a momentum trade.",
-      "catalyst": "Record long-term uranium price (Oct 31); NRC approvals for new reactors (X-energy Long Mott, Nov 9); utility contracting; Cameco/Kazatomprom supply updates.",
-      "grade": "C",
-      "stop": 38.5,
-      "target": 55,
-      "targetBase": 55,
-      "targetBull": 70,
-      "timeframe": "3-12 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "Grade C: still a Stage 4 downtrend (below falling 50-day $47.8 and 200-day $58). A safer add is a close back above the 50-day. Stop $38.50 = under the Nov 5 low ($39.07). The nuclear theme sold off after the midterms; this needs patience.",
-      "reasons": [
-        {
-          "text": "Long-term uranium price reached a record US$97/lb at Oct 31 (UxC), up ~13% this year; spot $92.65",
-          "sources": [
-            {
-              "title": "Purepoint monthly uranium update (UxC prices)",
-              "url": "https://purepoint.ca/wp-content/uploads/2026/11/PTU_Newsletter_2026_11.pdf"
-            }
-          ]
-        },
-        {
-          "text": "Spot below its January peak while the long-term indicator kept rising; Cameco says LT price is near its highest since 2011 in real terms",
-          "sources": [
-            {
-              "title": "Oregon Group: uranium's sell-off hides a tightening supply outlook",
-              "url": "https://theoregongroup.com/latest-news/uranium-sell-off-hides-tightening-supply-outlook/"
-            }
-          ]
-        },
-        {
-          "text": "Record term prices mark a new phase; spot cycle peak was $107, all-time high $136",
-          "sources": [
-            {
-              "title": "Sprott: Record term prices mark a new phase for uranium",
-              "url": "https://sprott.com/insights/record-term-prices-mark-a-new-phase-for-uranium/"
-            }
-          ]
-        },
-        {
-          "text": "Risk: miners have lagged the commodity for months; risk-off selling and policy changes after the midterms hit nuclear names; Sprott trust hasn't bought uranium since July",
-          "sources": []
-        },
-        {
-          "text": "Nov 11: Bloomberg reports CME is close to launching a physically backed uranium futures contract (storage deal with ConverDyn expected by year-end, not guaranteed), a sign of deeper market access for uranium; URNM ~$42.4, still below its 50-day (~$47)",
-          "sources": [
-            {
-              "title": "Bloomberg: CME pursues physical uranium contracts",
-              "url": "https://news.bloomberglaw.com/environment-and-energy/nuclear-revival-spurs-cme-to-pursue-physical-uranium-contracts"
-            }
-          ]
-        }
-      ],
-      "baseTimeframe": "3-6 months",
-      "bullTimeframe": "6-12 months",
-      "bullCase": "spot uranium breaks above $100/lb and utilities speed up long-term contracting, pulling miners back toward their January highs",
-      "horizon": "swing"
-    },
-    {
       "id": "2026-11-10-FROG",
       "ticker": "FROG",
       "company": "JFrog",
@@ -765,72 +647,6 @@
       "baseTimeframe": "1-2 months",
       "bullTimeframe": "2-3 months",
       "bullCase": "if the new bi-lateral lumbar system and the higher CMS inpatient payment keep growth near 50%+ and the first 2027 guidance beats, and no equity raise lands",
-      "horizon": "swing"
-    },
-    {
-      "id": "2026-11-11-ANNX",
-      "ticker": "ANNX",
-      "company": "Annexon",
-      "dateCalled": "2026-11-11",
-      "calledAt": "2026-11-11T22:01:48.364Z",
-      "priceAtCall": 4.19,
-      "thesis": "Lottery: Annexon's eye drug vonaprument for geographic atrophy (a leading cause of blindness) has its big Phase 3 test, ARCHER II (659 patients), coming up: an independent data committee checks the Month-15 vision-loss endpoint in Q4 2026, which Wells Fargo expects between Thanksgiving and Christmas. Phase 2 showed a 14.2% gap vs sham; Wells Fargo says ARCHER II needs only about 5-6.6%, puts the odds at 55%, and sees a 3-4x re-rating on a win (target $27; named it its top biotech pick Nov 11). About $860M value at $4.19 including pre-funded warrants, with $213M cash and runway into 2028, so no raise is forced before the data. A 'keep going' verdict pushes the answer to Month 24 (Q3 2027) and the stock would likely drop hard.",
-      "catalyst": "ARCHER II Month-15 data-committee decision, Q4 2026 (expected late Nov to late Dec); if met, the two US sub-study results follow in Q1 2027. Tanruprubart (GBS) BLA filing also planned Q4 2026.",
-      "grade": "Lottery",
-      "stop": 3.6,
-      "target": 8.5,
-      "targetBase": 8.5,
-      "targetBull": 15,
-      "timeframe": "2 weeks to 3 months",
-      "status": "open",
-      "exitDate": null,
-      "exitPrice": null,
-      "notes": "",
-      "reasons": [
-        {
-          "text": "Q3 update (Nov 9): Month-15 primary endpoint assessment on track for Q4 2026, 90% retention, $213.4M cash, runway into 2028",
-          "sources": [
-            {
-              "title": "Annexon Q3 2026 release",
-              "url": "https://www.globenewswire.com/news-release/2026/11/09/3398918/0/en/annexon-reports-third-quarter-2026-financial-results-business-updates-and-key-anticipated-milestones.html"
-            }
-          ]
-        },
-        {
-          "text": "Wells Fargo top biotech pick (Nov 11): 55% odds of a Month-15 win, 3-4x re-rating potential, $27 target, decision expected between Thanksgiving and Christmas",
-          "sources": [
-            {
-              "title": "Investing.com: Wells Fargo names top pick",
-              "url": "https://www.investing.com/news/stock-market-news/wells-fargo-names-top-pick-in-biotechnology-sector-5019506"
-            }
-          ]
-        },
-        {
-          "text": "Trial design: 659 patients, 2:1 drug vs sham, powered over 90%; Phase 2 showed 73% risk reduction in 15-letter vision loss at the monthly dose",
-          "sources": [
-            {
-              "title": "Annexon investor call deck (Nov 3)",
-              "url": "https://annexonbiosciences.gcs-web.com/static-files/e55e4d2a-22d8-43a8-bf8c-6449df3a261b"
-            }
-          ]
-        },
-        {
-          "text": "Dilution check: active $150M at-the-market program ($37.5M sold so far) and a $50M Oxford loan; 190.8M shares plus 14.7M pre-funded warrants",
-          "sources": [
-            {
-              "title": "Annexon 10-Q (Q3 2026)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1528115/000119312526453585/annx-20260930.htm"
-            }
-          ]
-        },
-        {
-          "text": "Risk: a 'continue to Month 24' verdict or a miss would likely cut the stock 40-60%+ overnight, gapping past the stop. Liquid: about 3.4M shares/day. X chatter spiked on the Nov 5 trial update, not a promotion",
-          "sources": []
-        }
-      ],
-      "baseTimeframe": "on the Q4 2026 data-committee decision (late Nov to Dec)",
-      "bullTimeframe": "1-3 months (Q1 2027 sub-study results)",
-      "bullCase": "the data committee says ARCHER II met its Month-15 endpoint (expected late Nov to Dec 2026) and the Q1 2027 US sub-studies confirm it",
       "horizon": "swing"
     },
     {
