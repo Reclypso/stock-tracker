@@ -25,10 +25,10 @@
       "time": "2026-11-17T21:24:40Z"
     },
     "FROG": {
-      "changePct": -3.71,
-      "prevClose": 109.1457,
+      "changePct": -4.4,
+      "prevClose": 109.94,
       "price": 105.1,
-      "time": "2026-11-17T21:24:40Z"
+      "time": "2026-11-18T02:58:39Z"
     },
     "PYPD": {
       "changePct": 6.34,
@@ -61,10 +61,10 @@
       "time": "2026-11-17T21:24:40Z"
     },
     "XE": {
-      "changePct": -1.84,
-      "prevClose": 10.31,
+      "changePct": -1.36,
+      "prevClose": 10.26,
       "price": 10.12,
-      "time": "2026-11-17T21:24:40Z"
+      "time": "2026-11-18T02:58:39Z"
     },
     "XERS": {
       "changePct": 0.3,
@@ -73,5 +73,5 @@
       "time": "2026-11-17T21:24:40Z"
     }
   },
-  "updated": "2026-11-17T21:24:46Z"
+  "updated": "2026-11-18T02:58:39Z"
 }
