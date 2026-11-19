@@ -1,77 +1,77 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 0.7,
-      "prevClose": 79.4997,
-      "price": 80.06,
-      "time": "2026-11-18T20:56:42Z"
+      "changePct": -2.09,
+      "prevClose": 81.5,
+      "price": 79.8,
+      "time": "2026-11-19T02:08:22Z"
     },
     "CAPR": {
-      "changePct": -8.25,
+      "changePct": -8.02,
       "prevClose": 8.73,
-      "price": 8.01,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 8.03,
+      "time": "2026-11-19T02:08:22Z"
     },
     "CARL": {
-      "changePct": -1.75,
-      "prevClose": 17.71,
-      "price": 17.4,
-      "time": "2026-11-18T20:56:42Z"
+      "changePct": -2.09,
+      "prevClose": 17.74,
+      "price": 17.37,
+      "time": "2026-11-19T02:08:22Z"
     },
     "FIGR": {
-      "changePct": 4.04,
+      "changePct": 3.82,
       "prevClose": 25.1,
-      "price": 26.115,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 26.06,
+      "time": "2026-11-19T02:08:22Z"
     },
     "FROG": {
-      "changePct": 8.71,
-      "prevClose": 105.6,
-      "price": 114.8,
-      "time": "2026-11-18T20:56:42Z"
+      "changePct": 4.98,
+      "prevClose": 108.95,
+      "price": 114.38,
+      "time": "2026-11-19T02:08:22Z"
     },
     "PYPD": {
-      "changePct": -6.61,
+      "changePct": -6.04,
       "prevClose": 6.9818,
-      "price": 6.52,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 6.56,
+      "time": "2026-11-19T02:08:22Z"
     },
     "SLS": {
-      "changePct": 5.86,
+      "changePct": 6.21,
       "prevClose": 16.9,
-      "price": 17.89,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 17.95,
+      "time": "2026-11-19T02:08:22Z"
     },
     "SVRA": {
-      "changePct": 2.46,
+      "changePct": 2.9,
       "prevClose": 4.5871,
-      "price": 4.7,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 4.72,
+      "time": "2026-11-19T02:08:22Z"
     },
     "TLS": {
-      "changePct": 7.13,
-      "prevClose": 6.945,
-      "price": 7.44,
-      "time": "2026-11-18T20:56:42Z"
+      "changePct": 9.78,
+      "prevClose": 6.75,
+      "price": 7.41,
+      "time": "2026-11-19T02:08:22Z"
     },
     "TMDX": {
-      "changePct": 2.63,
+      "changePct": 2.82,
       "prevClose": 93.7874,
-      "price": 96.25,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 96.43,
+      "time": "2026-11-19T02:08:22Z"
     },
     "XE": {
-      "changePct": -2.08,
+      "changePct": -2.61,
       "prevClose": 10.36,
-      "price": 10.145,
-      "time": "2026-11-18T20:56:42Z"
+      "price": 10.09,
+      "time": "2026-11-19T02:08:22Z"
     },
     "XERS": {
-      "changePct": 1.45,
-      "prevClose": 16.7626,
-      "price": 17.005,
-      "time": "2026-11-18T20:56:42Z"
+      "changePct": 1.37,
+      "prevClose": 16.76,
+      "price": 16.99,
+      "time": "2026-11-19T02:08:22Z"
     }
   },
-  "updated": "2026-11-18T20:56:42Z"
+  "updated": "2026-11-19T02:08:22Z"
 }
