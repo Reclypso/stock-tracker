@@ -1,53 +1,53 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 5.02,
-      "prevClose": 76.33,
-      "price": 80.16,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": -6.37,
+      "prevClose": 80.16,
+      "price": 75.05,
+      "time": "2026-11-24T22:49:34Z"
     },
     "CARL": {
-      "changePct": 2.87,
-      "prevClose": 17.42,
-      "price": 17.92,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": 0.45,
+      "prevClose": 17.92,
+      "price": 18.0,
+      "time": "2026-11-24T22:49:34Z"
     },
     "FROG": {
-      "changePct": 4.86,
-      "prevClose": 101.7187,
-      "price": 106.66,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": -1.42,
+      "prevClose": 106.0792,
+      "price": 104.57,
+      "time": "2026-11-24T22:49:34Z"
     },
     "PYPD": {
-      "changePct": -11.23,
-      "prevClose": 6.5,
-      "price": 5.77,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": -5.38,
+      "prevClose": 5.86,
+      "price": 5.545,
+      "time": "2026-11-24T22:49:34Z"
     },
     "TLS": {
-      "changePct": 5.77,
-      "prevClose": 7.28,
-      "price": 7.7,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": 2.08,
+      "prevClose": 7.71,
+      "price": 7.87,
+      "time": "2026-11-24T22:49:34Z"
     },
     "VNDA": {
-      "changePct": 1.16,
-      "prevClose": 3.4501,
-      "price": 3.49,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": 7.45,
+      "prevClose": 3.49,
+      "price": 3.75,
+      "time": "2026-11-24T22:49:34Z"
     },
     "XE": {
-      "changePct": 7.91,
-      "prevClose": 9.17,
-      "price": 9.895,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": -13.7,
+      "prevClose": 10.0,
+      "price": 8.63,
+      "time": "2026-11-24T22:49:34Z"
     },
     "XERS": {
-      "changePct": 3.98,
-      "prevClose": 16.85,
-      "price": 17.52,
-      "time": "2026-11-24T00:26:30Z"
+      "changePct": 0.51,
+      "prevClose": 17.6,
+      "price": 17.69,
+      "time": "2026-11-24T22:49:34Z"
     }
   },
-  "updated": "2026-11-24T00:26:30Z"
+  "updated": "2026-11-24T22:49:34Z"
 }
