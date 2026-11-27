@@ -477,6 +477,91 @@
       "bullTimeframe": "1-3 months after approval and launch",
       "bullCase": "the FDA approves Quimilza on time and the BYSANTI/NEREUS launches add sales growth",
       "horizon": "fast"
+    },
+    {
+      "id": "2026-11-27-AFG",
+      "ticker": "AFG",
+      "company": "American Financial Group",
+      "dateCalled": "2026-11-27",
+      "calledAt": "2026-11-27T14:54:04.948Z",
+      "priceAtCall": 161,
+      "entryTrigger": 163.5,
+      "side": "long",
+      "type": "macro",
+      "thesis": "Macro (long-term): The Fed is hiking (a Dec 9 hike is ~98% priced, January ~59%) and the 10-year sits near 4.9%, which hurts tech, gold and crypto but lifts what insurers earn on their float. AFG (specialty P&C insurer) is the cleanest way to own that: record Q3 core EPS $3.97 (+48% y/y) on higher investment income, 9% premium growth, 26% core ROE, plus a $3.50 special dividend. Financials (XLF) are one of the few sectors in a Stage 2 uptrend while SPY/QQQ are below their 200-day. Buy only on a breakout above the 52-week high ($163.29); hold months to 1-2 years while rates stay high.",
+      "catalyst": "Higher-for-longer Fed (Dec 8-9 FOMC hike priced ~98%); record Q3 2026 results Nov 3; Q4 results ~early Feb 2027",
+      "grade": "A",
+      "stop": 154.9,
+      "initialStop": 154.9,
+      "target": 180,
+      "targetBase": 180,
+      "targetBull": 188,
+      "timeframe": null,
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Record Q3 2026: core EPS $3.97 (+48% y/y), driven by higher net investment income; net written premiums +9%; core ROE 26%; $3.50 special dividend paid Nov 25",
+          "sources": [
+            {
+              "title": "AFG Q3 2026 release (Nov 3)",
+              "url": "https://www.afginc.com/news-releases/news-release-details/american-financial-group-inc-announces-third-quarter-results-10"
+            }
+          ]
+        },
+        {
+          "text": "Macro: CME FedWatch ~98% odds of a 25 bp hike Dec 9, ~59% for another in January; core PCE 3.3% in October. Higher short rates raise insurer reinvestment yields",
+          "sources": [
+            {
+              "title": "EC Markets on FedWatch (Nov 25)",
+              "url": "https://www.ecmarkets.com/insights/fed-rate-hike-odds-pce-inflation/"
+            },
+            {
+              "title": "Invezz on PCE and hike odds (Nov 26)",
+              "url": "https://invezz.com/news/2026/11/26/fed-rate-hike-odds-rise-to-almost-100-can-ai-selloff-force-a-rethink/"
+            }
+          ]
+        },
+        {
+          "text": "Tape: swing scanner has XLF +15.4pp vs SPY over 6 months and in Stage 2; AFG Trend Template 7/7, 1.5% under its 52-week high; machine rubric grade A (compounder 88/100, revenue accelerating 2+ quarters, clean balance sheet)",
+          "sources": []
+        },
+        {
+          "text": "Analysts: Wells Fargo target $180 (overweight); average target ~$159, KBW $150 market perform, warns P&C pricing is slowing. Price is already above the average target, so upside depends on rates staying high",
+          "sources": [
+            {
+              "title": "MarketBeat consensus (Nov 11)",
+              "url": "https://www.marketbeat.com/instant-alerts/consensus-american-financial-group-inc-nyse-afg-stock-rated-moderate-buy-by-wall-street-brokerages-2026-11-11/"
+            },
+            {
+              "title": "Investing.com on KBW (Nov 9)",
+              "url": "https://www.investing.com/news/analyst-ratings/keefe-bruyette-raises-american-financial-stock-price-target-on-earnings-93CH-5012323"
+            }
+          ]
+        },
+        {
+          "text": "Risk check: large-cap (~$13B) insurer, no offerings/going-concern; 2 insiders sold ~$366k in 90 days (not 10b5-1, small vs cap); about $64M a day traded, tight spreads; no earnings until ~Feb, but FOMC Dec 9 and CPI Dec 10 can swing the tape; RED regime so half size; stop $154.90 sits under the Nov 19-23 lows ($155.5-155.7), about 3 ATR (ATR ~$2.83) from the trigger; slow mover, so base target is +10%, bull +15%",
+          "sources": []
+        }
+      ],
+      "baseTimeframe": "6-12 months",
+      "bullTimeframe": "12-24 months",
+      "bullCase": "if rates stay high into 2027 and P&C pricing holds, the market pays ~15x KBW's 2027 EPS ($12.50) = ~$188",
+      "horizon": "swing",
+      "sector": "Financial",
+      "vet": {
+        "decision": "PASS",
+        "checkedAt": "2026-11-27T14:54:06Z",
+        "rules": "2026-11-26",
+        "regime": "RED",
+        "stage": "Stage 2",
+        "peadException": false,
+        "atr14": 2.9813,
+        "stopAtr": 2.88,
+        "size": "half"
+      }
     }
   ]
 }
