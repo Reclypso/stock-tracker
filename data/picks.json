@@ -562,6 +562,75 @@
         "stopAtr": 2.88,
         "size": "half"
       }
+    },
+    {
+      "id": "2026-11-27-ANF",
+      "ticker": "ANF",
+      "company": "Abercrombie & Fitch",
+      "dateCalled": "2026-11-27",
+      "calledAt": "2026-11-27T16:56:38.179Z",
+      "priceAtCall": 184.55,
+      "entryTrigger": 186,
+      "side": "long",
+      "type": "swing",
+      "thesis": "Medium-term: day-3 held earnings gap (+13.1% on 4.5x volume, 11/24) on a Stage 2 / Trend Template retailer now breaking to a 52-week high; record Q3 sales and a raised FY outlook set up post-earnings drift.",
+      "catalyst": "Q3 FY26 beat + raised FY guide (11/24/2026), ongoing $500M+ buybacks",
+      "grade": "B",
+      "stop": 164.5,
+      "initialStop": 164.5,
+      "target": 210,
+      "targetBase": 210,
+      "targetBull": 235,
+      "timeframe": null,
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3: record net sales $1.435B (+11%), comps +6%, EPS $3.82 (+62%, incl. ~$0.40 tariff refund); FY guide raised to ~6% sales growth and EPS $13.70-$13.90 (from $13.10-$13.60)",
+          "sources": [
+            {
+              "title": "ANF Q3 FY2026 release",
+              "url": "https://abercrombieandfitchcompany.gcs-web.com/news-releases/news-release-details/abercrombie-fitch-co-reports-third-quarter-fiscal-2026-results/"
+            }
+          ]
+        },
+        {
+          "text": "PEAD v2: +13.1% gap on 4.5x rel volume, held 2 closes above gap low 156.58, Stage 2 + Trend Template; closed 184.55 on 11/27 at a new 52-week high (185.72 intraday). Machine rubric (swing): A, 83",
+          "sources": [
+            {
+              "title": "8-K 11/24/2026",
+              "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001018840&type=8-K"
+            }
+          ]
+        },
+        {
+          "text": "Risk check: no offerings (only routine S-8); YTD buybacks $382M (9% of shares); cluster of 4 Form 144s filed 11/27 for ~$6.1M of vested RSU sales by officers Desai ($3.65M), Lipesky ($1.82M), Ball ($0.55M) and director Nunez ($0.14M), ~0.08% of 42.4M shares; already +31% from pre-earnings 140.45 (late-ish); ATR14 ~10.2, stop 164.50 under the 11/25 low is ~2.1 ATR; RED regime and Q3 EPS helped by a one-off tariff refund; next earnings ~early March 2027. Downgraded A->B for the 2+ soft risks; half size in RED",
+          "sources": [
+            {
+              "title": "EDGAR Form 144 filings 11/27/2026",
+              "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001018840&type=144"
+            }
+          ]
+        }
+      ],
+      "baseTimeframe": "4-8 weeks",
+      "bullTimeframe": "2-3 months",
+      "bullCase": "holiday sales confirm the ~7% Q4 growth guide and the stock holds above the 11/25 low while the tape recovers",
+      "horizon": "swing",
+      "sector": "Consumer Cyclical",
+      "vet": {
+        "decision": "PASS",
+        "checkedAt": "2026-11-27T16:56:40Z",
+        "rules": "2026-11-26",
+        "regime": "RED",
+        "stage": "Stage 2",
+        "peadException": false,
+        "atr14": 9.6556,
+        "stopAtr": 2.23,
+        "size": "half"
+      }
     }
   ]
 }
