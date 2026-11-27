@@ -2202,9 +2202,204 @@ function onToggle(event) {
   else state.openKeys.delete(key);
 }
 
+const LOOP_VIDEO_ID = "_PhjyyK1dIk";
+const YT_IFRAME_API = "https://www.youtube.com/iframe_api";
+
+const sound = {
+  player: null,
+  ready: false,
+  wantOn: true,
+  unlocked: false,
+};
+
+function soundButton() {
+  return document.getElementById("sound-toggle");
+}
+
+function paintSoundButton() {
+  const btn = soundButton();
+  if (!btn) return;
+  const label = btn.querySelector(".sound-label");
+  btn.classList.remove("is-pending", "is-on", "is-muted");
+  if (!sound.wantOn) {
+    btn.classList.add("is-muted");
+    btn.setAttribute("aria-pressed", "false");
+    btn.setAttribute("aria-label", "Unmute sound");
+    if (label) label.innerHTML = "Muted";
+    return;
+  }
+  if (!sound.unlocked) {
+    btn.classList.add("is-pending");
+    btn.setAttribute("aria-pressed", "false");
+    btn.setAttribute("aria-label", "Enable sound");
+    if (label) label.innerHTML = '<span class="sound-lead">Enable&nbsp;</span>Sound';
+    return;
+  }
+  btn.classList.add("is-on");
+  btn.setAttribute("aria-pressed", "true");
+  btn.setAttribute("aria-label", "Mute sound");
+  if (label) label.innerHTML = "Sound";
+}
+
+function applyWantedPlayback() {
+  const player = sound.player;
+  if (!player || !sound.ready) return;
+  try {
+    if (!sound.wantOn) {
+      if (typeof player.mute === "function") player.mute();
+      return;
+    }
+    if (typeof player.unMute === "function") player.unMute();
+    if (typeof player.setVolume === "function") player.setVolume(100);
+    if (typeof player.playVideo === "function") player.playVideo();
+  } catch {
+    // Autoplay may reject until a user gesture; the unlock path retries.
+  }
+}
+
+function markUnlockedIfPlaying() {
+  if (!sound.wantOn || !sound.player || !sound.ready) return false;
+  try {
+    const YT = window.YT;
+    const playing = YT && YT.PlayerState
+      ? sound.player.getPlayerState() === YT.PlayerState.PLAYING
+      : false;
+    const muted = typeof sound.player.isMuted === "function" ? sound.player.isMuted() : false;
+    if (playing && !muted) {
+      sound.unlocked = true;
+      paintSoundButton();
+      return true;
+    }
+  } catch {
+    // Player not queryable yet.
+  }
+  return false;
+}
+
+function onLoopStateChange(event) {
+  const YT = window.YT;
+  if (!YT || !YT.PlayerState) return;
+  if (event.data === YT.PlayerState.ENDED) {
+    try {
+      event.target.seekTo(0);
+      event.target.playVideo();
+    } catch {
+      // loop=1 + playlist should still restart if seek fails.
+    }
+    return;
+  }
+  if (event.data !== YT.PlayerState.PLAYING) return;
+  if (!sound.wantOn) {
+    try { event.target.mute(); } catch { /* ignore */ }
+    return;
+  }
+  try {
+    if (event.target.isMuted()) {
+      if (sound.unlocked) event.target.unMute();
+    } else {
+      sound.unlocked = true;
+      paintSoundButton();
+    }
+  } catch {
+    // Ignore API timing errors.
+  }
+}
+
+function createLoopPlayer() {
+  const host = document.getElementById("yt-player");
+  const YT = window.YT;
+  if (!host || !YT || !YT.Player || sound.player) return;
+  try {
+    sound.player = new YT.Player(host, {
+      width: 1,
+      height: 1,
+      videoId: LOOP_VIDEO_ID,
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        iv_load_policy: 3,
+        loop: 1,
+        modestbranding: 1,
+        playsinline: 1,
+        playlist: LOOP_VIDEO_ID,
+        rel: 0,
+        enablejsapi: 1,
+        origin: location.origin,
+      },
+      events: {
+        onReady(event) {
+          sound.ready = true;
+          sound.player = event.target;
+          applyWantedPlayback();
+          window.setTimeout(() => {
+            if (!markUnlockedIfPlaying() && sound.wantOn && !sound.unlocked) {
+              paintSoundButton();
+            }
+          }, 700);
+        },
+        onStateChange: onLoopStateChange,
+        onError() {},
+      },
+    });
+  } catch {
+    sound.player = null;
+  }
+}
+
+function onSoundToggle(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  if (sound.wantOn && sound.unlocked) {
+    sound.wantOn = false;
+    try { sound.player?.mute?.(); } catch { /* ignore */ }
+  } else {
+    sound.wantOn = true;
+    sound.unlocked = true;
+    applyWantedPlayback();
+  }
+  paintSoundButton();
+}
+
+function unlockSoundFromGesture(event) {
+  if (!sound.wantOn || sound.unlocked) return;
+  const target = event && event.target;
+  if (target && typeof target.closest === "function" && target.closest("#sound-toggle")) return;
+  sound.unlocked = true;
+  applyWantedPlayback();
+  paintSoundButton();
+}
+
+function startLoopAudio() {
+  paintSoundButton();
+  const btn = soundButton();
+  if (btn) btn.addEventListener("click", onSoundToggle);
+  document.addEventListener("pointerdown", unlockSoundFromGesture, true);
+  document.addEventListener("keydown", unlockSoundFromGesture, true);
+
+  if (window.YT && window.YT.Player) {
+    createLoopPlayer();
+    return;
+  }
+  const previous = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = () => {
+    if (typeof previous === "function") previous();
+    createLoopPlayer();
+  };
+  if (!document.querySelector(`script[src="${YT_IFRAME_API}"]`)) {
+    const script = document.createElement("script");
+    script.src = YT_IFRAME_API;
+    script.async = true;
+    script.onerror = () => {};
+    document.head.appendChild(script);
+  }
+}
+
 function boot() {
   const board = document.getElementById("board");
   if (!board) return;
+  startLoopAudio();
   state.sort = loadSort();
   state.filter = loadFilter();
   state.pending = loadPending();

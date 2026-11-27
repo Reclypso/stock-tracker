@@ -41,6 +41,20 @@
       </a>
       <div class="topbar-meta">
         <span id="live" class="live ok" role="status"><span class="live-dot" aria-hidden="true"><i></i><i></i></span><span id="live-label">Live</span></span>
+        <button type="button" id="sound-toggle" class="sound-toggle is-pending" aria-pressed="false" aria-label="Enable sound">
+          <span class="sound-icon" aria-hidden="true">
+            <svg class="sound-icon-waves" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.8 9.5v5h3.1L12 19V5L6.9 9.5H3.8z" fill="currentColor" stroke="none"/>
+              <path class="wave w1" d="M15.15 9.15a3.15 3.15 0 0 1 0 5.7"/>
+              <path class="wave w2" d="M17.7 7a6.05 6.05 0 0 1 0 10"/>
+            </svg>
+            <svg class="sound-icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.8 9.5v5h3.1L12 19V5L6.9 9.5H3.8z" fill="currentColor" stroke="none"/>
+              <path d="m15.6 10.2 5.2 5.2M20.8 10.2l-5.2 5.2"/>
+            </svg>
+          </span>
+          <span class="sound-label"><span class="sound-lead">Enable&nbsp;</span>Sound</span>
+        </button>
       </div>
     </div>
     <div class="poll-line" aria-hidden="true"><span id="poll-line"></span></div>
@@ -98,6 +112,10 @@
         <p class="footer-sub">Quotes are delayed. Times shown in Pacific.</p>
       </div>
     </footer>
+  </div>
+
+  <div id="yt-audio" class="yt-audio" aria-hidden="true">
+    <div id="yt-player"></div>
   </div>
 
   <noscript>

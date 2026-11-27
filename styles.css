@@ -262,6 +262,112 @@ button { font: inherit; color: inherit; }
 .live.bad { color: var(--down); background: rgba(var(--down-rgb), 0.08); border-color: rgba(var(--down-rgb), 0.3); box-shadow: 0 0 24px rgba(var(--down-rgb), 0.15); }
 .live.bad .live-dot i { animation-duration: 1s; }
 
+.topbar-meta { flex-wrap: nowrap; min-width: 0; }
+
+/* Offscreen 1×1 host — never display:none, or browsers may kill audio. */
+.yt-audio {
+  position: fixed;
+  left: -1px;
+  top: -1px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.yt-audio iframe {
+  width: 1px;
+  height: 1px;
+  border: 0;
+}
+
+.sound-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.08);
+  border: 1px solid rgba(var(--cyan-rgb), 0.28);
+  box-shadow: 0 0 22px rgba(var(--cyan-rgb), 0.12), inset 0 0 12px rgba(var(--cyan-rgb), 0.06);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.sound-toggle .sound-icon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: grid;
+  place-items: center;
+}
+.sound-toggle .sound-icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  grid-area: 1 / 1;
+  overflow: visible;
+}
+.sound-icon-muted { opacity: 0; }
+.sound-toggle.is-muted .sound-icon-waves { opacity: 0; }
+.sound-toggle.is-muted .sound-icon-muted { opacity: 1; }
+.sound-toggle.is-on {
+  color: var(--cyan);
+}
+.sound-toggle.is-on .wave {
+  transform-origin: 12px 12px;
+  animation: sound-wave 1.8s var(--ease) infinite;
+}
+.sound-toggle.is-on .wave.w2 { animation-delay: 0.25s; }
+.sound-toggle.is-muted {
+  color: var(--ink-3);
+  background: rgba(150, 165, 255, 0.06);
+  border-color: var(--line-2);
+  box-shadow: none;
+}
+.sound-toggle.is-pending {
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.08);
+  border-color: rgba(var(--gold-rgb), 0.32);
+  box-shadow: 0 0 24px rgba(var(--gold-rgb), 0.16), inset 0 0 12px rgba(var(--gold-rgb), 0.06);
+}
+.sound-toggle.is-pending .sound-icon {
+  animation: sound-pulse 1.6s var(--ease) infinite;
+}
+.sound-toggle:hover {
+  border-color: rgba(var(--cyan-rgb), 0.5);
+  box-shadow: 0 0 26px rgba(var(--cyan-rgb), 0.2), inset 0 0 12px rgba(var(--cyan-rgb), 0.08);
+}
+.sound-toggle.is-pending:hover {
+  border-color: rgba(var(--gold-rgb), 0.5);
+  box-shadow: 0 0 26px rgba(var(--gold-rgb), 0.24), inset 0 0 12px rgba(var(--gold-rgb), 0.08);
+}
+.sound-toggle.is-muted:hover {
+  color: var(--ink-2);
+  border-color: rgba(150, 165, 255, 0.35);
+}
+.sound-toggle:focus-visible { border-radius: 999px; }
+@keyframes sound-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.72; transform: scale(1.12); filter: drop-shadow(0 0 5px currentColor); }
+}
+@keyframes sound-wave {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
 .poll-line { height: 2px; overflow: hidden; }
 .poll-line span {
   display: block;
@@ -2041,10 +2147,27 @@ button { font: inherit; color: inherit; }
   .leads { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 }
 
+@media (max-width: 520px) {
+  .topbar-inner { gap: 8px; padding: 8px var(--pad); }
+  .topbar-meta { gap: 8px; }
+  .brand { gap: 8px; }
+  .brand-name { letter-spacing: 0.1em; }
+  .live, .sound-toggle {
+    min-height: 34px;
+    padding: 5px 10px 5px 8px;
+    letter-spacing: 0.1em;
+    gap: 6px;
+  }
+}
+@media (max-width: 420px) {
+  .sound-lead { display: none; }
+}
 @media (max-width: 380px) {
   .ticker { font-size: 26px; }
   .as-px { font-size: 22px; }
   .now-v { font-size: 20px; }
+  .brand-name { font-size: 14px; letter-spacing: 0.08em; }
+  .live, .sound-toggle { font-size: 11px; letter-spacing: 0.08em; padding: 5px 8px 5px 7px; }
 }
 
 /* Touch devices: no hover lift; keep the blur light. */
@@ -2076,4 +2199,6 @@ button { font: inherit; color: inherit; }
   .blip { opacity: 0.8; }
   .scope-sweep { transform: rotate(40deg); }
   .poll-line span { animation: none !important; transform: scaleX(0.5); opacity: 0.5; }
+  .sound-toggle.is-pending .sound-icon,
+  .sound-toggle.is-on .wave { animation: none !important; filter: none; transform: none; }
 }
