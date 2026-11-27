@@ -8,7 +8,7 @@
 
 import {
   EASE, canAnimate, reducedMotion, finePointer, shown, morphHtml, countUp, roll,
-  addTransient, burst, installTilt, installMagnetic, installRipple, captureRects, flip,
+  addTransient, burst, installSpotlight, installMagnetic, installRipple, captureRects, flip,
 } from "./fx.js";
 import { startBackground } from "./bg.js";
 
@@ -227,6 +227,44 @@ export function stopOf(pick) {
   return n != null && n > 0 ? n : null;
 }
 
+// Auto-sell: the limit-sell price to set at the broker. An explicit
+// `autoSell` / `sellTarget` / `auto_sell` on the pick wins (a number, a numeric
+// string, or an object with price / target / limit); otherwise it is the Base
+// target. `fromBase` is true when the price is the Base target itself.
+const AUTO_SELL_FIELDS = ["autoSell", "sellTarget", "auto_sell"];
+
+function priceField(value) {
+  if (typeof value === "number" || typeof value === "string") return num(value);
+  if (value && typeof value === "object") return priceField(value.price ?? value.target ?? value.limit);
+  return null;
+}
+
+export function autoSellOf(pick) {
+  const base = targetBaseOf(pick);
+  for (const field of AUTO_SELL_FIELDS) {
+    const n = priceField(pick?.[field]);
+    if (n != null && n > 0) {
+      return { price: n, explicit: true, fromBase: base != null && Math.abs(n - base) < 1e-9 };
+    }
+  }
+  return base != null ? { price: base, explicit: false, fromBase: true } : null;
+}
+
+// Plain-English names and one-line cues for every price level. One source for
+// the cards, the range bar, the trade plan and the chips.
+export const LEVELS = {
+  stop: { name: "Stop Loss", short: "Stop loss", cue: "Exit to cut losses", more: "Not a profit target." },
+  entry: { name: "Entry", short: "Entry", cue: "Price when Stock Bot called it" },
+  now: { name: "Now", short: "Now", cue: "Latest delayed quote" },
+  sell: { name: "Auto-Sell (Base)", short: "Auto-sell", cue: "Set limit sell here", more: "Main profit target." },
+  base: { name: "Base", short: "Base", cue: "Original base-case target" },
+  bull: { name: "Bull Stretch", short: "Bull stretch", cue: "Stretch upside if momentum runs", more: "Optional, beyond the auto-sell." },
+};
+
+export function autoSellName(sell) {
+  return !sell || sell.fromBase ? LEVELS.sell.name : "Auto-Sell Target";
+}
+
 function cleanText(value) {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -411,7 +449,7 @@ function pctClass(value) {
 export function leadTone(pick, current) {
   if (current == null) return "wait";
   const bull = targetBullOf(pick);
-  const base = targetBaseOf(pick);
+  const base = autoSellOf(pick)?.price ?? null;
   const stop = stopOf(pick);
   if (bull != null && current >= bull) return "bull";
   if (base != null && current >= base) return "hit";
@@ -538,223 +576,268 @@ function typeBadge(pick) {
   return `<span class="type-tag type-${type.key}">${icon}<span>${escapeHtml(type.label)}</span></span>`;
 }
 
-function compactLevels(pick) {
-  const entry = pick.priceAtCall;
-  const basePct = projectedPct(entry, targetBaseOf(pick));
-  const bullPct = projectedPct(entry, targetBullOf(pick));
-  const stop = stopOf(pick);
-  const cell = (kind, label, pct, timeframe) => {
-    if (pct == null) {
-      return `<span class="sum-lv sum-${kind} is-empty"><span class="sum-k">${label}</span><span class="sum-pct flat">—</span></span>`;
-    }
-    const when = timeframe ? `<span class="sum-when">${escapeHtml(timeframe)}</span>` : "";
-    return `<span class="sum-lv sum-${kind}"><span class="sum-k">${label}</span><span class="sum-pct ${pctClass(pct)}">${escapeHtml(formatProjection(pct))}</span>${when}</span>`;
-  };
-  const stopHtml = stop == null
-    ? `<span class="sum-lv sum-stop is-empty"><span class="sum-k">Stop</span><span class="sum-px flat">—</span></span>`
-    : `<span class="sum-lv sum-stop"><span class="sum-k">Stop</span><span class="sum-px">${escapeHtml(formatPrice(stop))}</span></span>`;
-  return `<div class="sum-levels">${cell("base", "Base", basePct, baseTimeframeOf(pick))}${cell("bull", "Bull", bullPct, bullTimeframeOf(pick))}${stopHtml}</div>`;
-}
-
 const ICONS = {
   trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 7V4.8c0-.4.4-.8.8-.8h3.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.9.8 1.6 1.7 1.6h5.8c.9 0 1.6-.7 1.7-1.6L17.5 7M10 11v6M14 11v6"/></svg>',
   ext: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3.8C3.4 3 3 3.4 3 3.8v8.4c0 .4.4.8.8.8h8.4c.4 0 .8-.4.8-.8V10M9 3h4v4M13 3 7.5 8.5"/></svg>',
   chev: '<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>',
   scan: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.2"/><circle cx="10" cy="10" r="3.4"/><path d="M10 10 15.2 4.8"/></svg>',
+  target: '<svg class="ico-target" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="2.6"/><path d="M8 .8v2.4M8 12.8v2.4M.8 8h2.4M12.8 8h2.4"/></svg>',
 };
+
+function whenPhrase(timeframe) {
+  if (!timeframe) return "";
+  return /^(in|by|within|over|before|after|on|at|around|upon|once|when|until|through|during|ahead|near|this|next|early|mid|late|end)\b/i.test(timeframe) ? timeframe : `in ${timeframe}`;
+}
+
+// "26.1% above now" / "14.0% below now" (distance from the latest quote).
+function fromNowPhrase(level, current) {
+  const phrase = distancePhrase(level, current);
+  if (!phrase) return "";
+  return phrase === "at price" ? "at the current price" : `${phrase} now`;
+}
+
+function levelInfo(kind, sell) {
+  return kind === "sell" ? { ...LEVELS.sell, name: autoSellName(sell) } : LEVELS[kind];
+}
+
+// The limit-sell callout on every open card: exact price, upside from entry
+// and from the latest quote, and the expected window.
+function autoSellStrip(pick, current) {
+  const sell = autoSellOf(pick);
+  if (!sell) {
+    return `<div class="autosell is-empty"><div class="as-id"><span class="as-k">${ICONS.target}Auto-Sell Target</span><span class="as-cue">No sell target set for this lead</span></div></div>`;
+  }
+  const name = autoSellName(sell);
+  const fromEntry = projectedPct(pick.priceAtCall, sell.price);
+  const fromNow = current != null ? projectedPct(current, sell.price) : null;
+  const hit = current != null && current >= sell.price;
+  const when = whenPhrase(baseTimeframeOf(pick));
+  const cue = hit ? "Target reached at the latest quote" : "Main profit target · set your limit sell here";
+  const ups = [];
+  if (fromEntry != null) ups.push(`<span class="as-up"><b class="${pctClass(fromEntry)}">${escapeHtml(formatPct(fromEntry))}</b> from entry</span>`);
+  if (hit) {
+    const past = projectedPct(sell.price, current);
+    ups.push(`<span class="as-up as-reached"><b>${past != null && past >= 0.05 ? escapeHtml(formatPct(past)) : "At"}</b> ${past != null && past >= 0.05 ? "past target" : "target now"}</span>`);
+  }
+  else if (fromNow != null) ups.push(`<span class="as-up"><b class="${pctClass(fromNow)}">${escapeHtml(formatPct(fromNow))}</b> from now</span>`);
+  const tip = `${name}: ${LEVELS.sell.more} Set a limit sell at ${formatPrice(sell.price)}.`;
+  return `<div class="autosell${hit ? " is-hit" : ""}" title="${escapeHtml(tip)}">
+      <div class="as-id">
+        <span class="as-k">${ICONS.target}${escapeHtml(name)}</span>
+        <span class="as-cue">${escapeHtml(cue)}</span>
+        ${when ? `<span class="as-when">Expected ${escapeHtml(when)}</span>` : ""}
+      </div>
+      <div class="as-val">
+        <span class="as-px">${escapeHtml(formatPrice(sell.price))}</span>
+        <span class="as-ups">${ups.join("")}</span>
+      </div>
+    </div>`;
+}
+
+// Collapsed-card levels: the auto-sell callout (open leads only) above the
+// price-range bar (stop loss → entry → now → auto-sell → bull stretch).
+function compactLevels(pick, current, opts = {}) {
+  const closed = !!opts.closed;
+  const bar = range(pick, current, { closed });
+  return `<div class="sum-levels${closed ? " is-closed" : ""}">${closed ? "" : autoSellStrip(pick, current)}${bar}</div>`;
+}
+
+function chip(cls, text) {
+  return `<span class="chip ${cls}"><i aria-hidden="true"></i>${text}</span>`;
+}
 
 function chips(pick, current, pending) {
   const out = [];
-  if (pending) out.push('<span class="chip chip-pending"><i aria-hidden="true"></i>Deletion requested…</span>');
+  if (pending) out.push(chip("chip-pending", "Deletion requested…"));
   if (pick.status !== "closed") {
-    if (current == null) out.push('<span class="chip chip-wait"><i aria-hidden="true"></i>Awaiting price</span>');
+    if (current == null) out.push(chip("chip-wait", "Awaiting price"));
     const bull = targetBullOf(pick);
+    const sell = autoSellOf(pick);
     const base = targetBaseOf(pick);
     const stop = stopOf(pick);
     if (current != null) {
-      if (bull != null && current >= bull) out.push('<span class="chip chip-bull"><i aria-hidden="true"></i>Bull hit</span>');
-      if (base != null && current >= base) out.push('<span class="chip chip-hit"><i aria-hidden="true"></i>Base hit</span>');
-      if (stop != null && current <= stop) out.push('<span class="chip chip-stop"><i aria-hidden="true"></i>Stop hit</span>');
-      else if (stop != null && current <= stop * 1.06) out.push('<span class="chip chip-near"><i aria-hidden="true"></i>Near stop</span>');
+      if (bull != null && current >= bull) out.push(chip("chip-bull", "Bull stretch hit"));
+      if (sell && current >= sell.price) out.push(chip("chip-hit", "Auto-sell target hit"));
+      if (sell && !sell.fromBase && base != null && current >= base) out.push(chip("chip-hit", "Base hit"));
+      if (stop != null && current <= stop) out.push(chip("chip-stop", "Stop loss hit"));
+      else if (stop != null && current <= stop * 1.06) out.push(chip("chip-near", "Near stop loss"));
     }
   }
   return out.length ? `<div class="chips">${out.join("")}</div>` : "";
 }
 
-function whenPhrase(timeframe) {
-  if (!timeframe) return "";
-  return /^(in|by|within|over|before|after)\b/i.test(timeframe) ? timeframe : `in ${timeframe}`;
-}
-
-function projection(pick, current, compact = false) {
-  const entry = pick.priceAtCall;
-  const base = targetBaseOf(pick);
-  const bull = targetBullOf(pick);
-  const basePct = projectedPct(entry, base);
-  const bullPct = projectedPct(entry, bull);
-  if (basePct == null && bullPct == null) {
-    return `<div class="proj proj-none"><span class="proj-k">Projection</span><span class="proj-none-t">No targets set for this lead</span></div>`;
+// One price level in plain English: name, what it means, exact price, move
+// from entry, distance from the latest quote and (for targets) the window.
+function levelCell(kind, level, current, opts = {}) {
+  const info = levelInfo(kind, opts.sell);
+  // Closed leads: the sell level is history, not an order to place.
+  const cue = opts.closed && kind === "sell" ? "Main profit target" : info.cue;
+  const head = `<dt><span class="lv-k">${escapeHtml(info.name)}</span><span class="lv-cue">${escapeHtml(cue)}</span></dt>`;
+  if (num(level) == null) {
+    return `<div class="level lv-${kind} is-empty">${head}<dd class="lv-price"><span class="lv-v">—</span></dd><dd class="lv-detail"><span class="lv-more">Not set for this lead.</span></dd></div>`;
   }
-  const row = (kind, label, pct, target, timeframe, cond) => {
-    if (pct == null) {
-      return `<div class="proj-row proj-${kind} is-empty"><span class="proj-k">${label}</span><span class="proj-pct flat">—</span><span class="proj-when">no ${kind} target</span></div>`;
-    }
-    const reached = pick.status !== "closed" && current != null && current >= target;
-    const when = whenPhrase(timeframe);
-    return `<div class="proj-row proj-${kind}${reached ? " is-reached" : ""}">
-      <span class="proj-k">${label}${reached ? '<span class="proj-check" aria-label="reached">✓</span>' : ""}</span>
-      <span class="proj-pct ${pctClass(pct)}">${escapeHtml(formatProjection(pct))}</span>
-      <span class="proj-when">${when ? escapeHtml(when) : "no timeframe set"}</span>
-      <span class="proj-tgt"><span class="sr-only">${label} target </span>${escapeHtml(formatPrice(target))}</span>
-      ${cond ? `<p class="proj-if"><span class="proj-if-k">if</span> ${escapeHtml(cond)}</p>` : ""}
+  const mark = num(opts.mark);
+  const reached = mark != null && (kind === "stop" ? mark <= level : mark >= level);
+  const fromEntry = projectedPct(opts.entry, level);
+  const fromNow = fromNowPhrase(level, current);
+  const facts = [];
+  if (fromEntry != null) facts.push(`<span class="lv-pct ${pctClass(fromEntry)}">${escapeHtml(formatPct(fromEntry))}</span> from entry`);
+  if (fromNow) facts.push(`<span class="dist">${escapeHtml(fromNow)}</span>`);
+  const when = whenPhrase(opts.when);
+  const check = reached ? `<span class="lv-check">${kind === "stop" ? "Hit" : "✓ Hit"}</span>` : "";
+  const more = opts.closed && kind === "sell" ? "" : info.more;
+  return `<div class="level lv-${kind}${reached ? " is-reached" : ""}">${head}
+      <dd class="lv-price"><span class="lv-v">${escapeHtml(formatPrice(level))}</span>${check}</dd>
+      <dd class="lv-detail">
+        ${facts.map((fact) => `<span class="lv-fact">${fact}</span>`).join("")}
+        ${when ? `<span class="lv-when">Expected ${escapeHtml(when)}</span>` : ""}
+        ${more ? `<span class="lv-more">${escapeHtml(more)}</span>` : ""}
+      </dd>
     </div>`;
-  };
-  return `<div class="proj${compact ? " proj-compact" : ""}" role="group" aria-label="Projection">
-    ${row("base", "Base", basePct, base, baseTimeframeOf(pick))}
-    ${row("bull", "Bull", bullPct, bull, bullTimeframeOf(pick), bullCaseOf(pick))}
-  </div>`;
 }
 
-// Two real points (call, latest) drawn as a smooth path, plus the stop/base/
-// bull levels. Labelled as a 2-point path so nobody reads it as history.
-function chart(pick, current, id, closed = false) {
+// Trade plan: stop loss, auto-sell (base) and bull stretch side by side, then
+// the condition behind the bull stretch. Closed leads show the same levels
+// without the "from now" distances.
+function projection(pick, current, compact = false) {
+  const closed = pick.status === "closed";
   const entry = num(pick.priceAtCall);
-  if (entry == null || entry <= 0) return "";
-  const levels = [["stop", "Stop", stopOf(pick)], ["base", "Base", targetBaseOf(pick)], ["bull", "Bull", targetBullOf(pick)]]
-    .filter(([, , v]) => v != null);
-  const values = [entry, ...levels.map(([, , v]) => v)];
-  if (current != null) values.push(current);
-  let lo = Math.min(...values);
-  let hi = Math.max(...values);
-  const span = hi - lo || hi * 0.1 || 1;
-  lo -= span * 0.12;
-  hi += span * 0.16;
-  const W = 320;
-  const H = 108;
-  const x0 = 16;
-  const x1 = W - 92;
-  const top = 10;
-  const bot = H - 10;
-  const y = (v) => +(bot - ((v - lo) / (hi - lo)) * (bot - top)).toFixed(2);
-  const y0 = y(entry);
-
-  // Level labels: keep at least 11 units apart.
-  const marks = levels.map(([k, label, v]) => ({ k, label, v, y: y(v) })).sort((a, b) => b.y - a.y);
-  let lastY = Infinity;
-  for (const m of marks) {
-    m.ty = Math.min(m.y - 4, lastY - 11);
-    lastY = m.ty;
-  }
-  const lines = marks.map((m) => `<line class="lv lv-${m.k}" x1="${x0}" x2="${W - 4}" y1="${m.y}" y2="${m.y}"/><text class="lv-t lv-t-${m.k}" x="${W - 4}" y="${Math.max(9, m.ty).toFixed(1)}" text-anchor="end">${escapeHtml(m.label.toUpperCase())} ${escapeHtml(formatPrice(m.v))}</text>`).join("");
-  const label = closed ? "Close" : "Now";
-  let body;
-  let aria;
-  if (current == null) {
-    aria = `${pick.ticker}: called at ${formatPrice(entry)}, awaiting first quote`;
-    body = `<line class="scan-line" x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}"/>
-      <circle class="call-dot" cx="${x0}" cy="${y0}" r="3.4"/>
-      <text class="await-t" x="${(x0 + x1) / 2}" y="${Math.max(14, y0 - 10)}" text-anchor="middle">AWAITING FIRST QUOTE</text>`;
-  } else {
-    const y1 = y(current);
-    const mid = (x1 - x0) * 0.5;
-    const d = `M${x0} ${y0} C${x0 + mid} ${y0} ${x1 - mid} ${y1} ${x1} ${y1}`;
-    aria = `${pick.ticker}: called at ${formatPrice(entry)}, ${label.toLowerCase()} ${formatPrice(current)}`;
-    body = `<path class="area" d="${d} L${x1} ${bot + 10} L${x0} ${bot + 10} Z" fill="url(#ga-${id})"/>
-      <path class="line" d="${d}" pathLength="1" stroke="url(#gl-${id})"/>
-      <circle class="call-dot" cx="${x0}" cy="${y0}" r="3.4"/>
-      <text class="pt-t" x="${x0 + 6}" y="${y0 > H / 2 ? y0 - 8 : y0 + 14}">CALL</text>
-      <g class="end" transform="translate(${x1} ${y1})"><circle class="end-glow" r="10"/><circle class="end-dot" r="4"/></g>`;
-  }
-  return `<figure class="chart">
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(aria)}">
-      <defs>
-        <linearGradient id="ga-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.32"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient>
-        <linearGradient id="gl-${id}" gradientUnits="userSpaceOnUse" x1="${x0}" y1="0" x2="${x1}" y2="0"><stop offset="0" stop-color="currentColor" stop-opacity="0.3"/><stop offset="1" stop-color="currentColor"/></linearGradient>
-      </defs>
-      ${lines}${body}
-    </svg>
-    <figcaption>Call → ${closed ? "close" : "now"} · two-point path, not price history</figcaption>
-  </figure>`;
-}
-
-// Track from the lowest to the highest level, with stop/call/base/bull
-// markers, the call→now fill and a head dot at the current price.
-export function rangeModel(pick, current) {
-  const call = num(pick?.priceAtCall);
+  const sell = autoSellOf(pick);
   const base = targetBaseOf(pick);
   const bull = targetBullOf(pick);
-  if (call == null || call <= 0 || (base == null && bull == null)) return null;
   const stop = stopOf(pick);
-  const vals = [call, stop, base, bull, current].filter((v) => v != null && v > 0);
-  let lo = Math.min(...vals);
-  let hi = Math.max(...vals);
-  const span = hi - lo || hi * 0.1 || 1;
-  lo -= span * 0.05;
-  hi += span * 0.05;
-  const pos = (v) => (v == null ? null : +(((v - lo) / (hi - lo)) * 100).toFixed(2));
-  return { call: pos(call), stop: pos(stop), base: pos(base), bull: pos(bull), now: pos(current) };
+  if (!sell && bull == null && stop == null) {
+    return `<div class="plan plan-none"><span class="plan-t">Trade plan</span><span class="plan-none-t">No stop loss or targets set for this lead</span></div>`;
+  }
+  const ref = closed ? null : current;
+  const common = { entry, mark: current, sell, closed };
+  const cells = [
+    levelCell("stop", stop, ref, common),
+    levelCell("sell", sell ? sell.price : null, ref, { ...common, when: baseTimeframeOf(pick) }),
+    sell && !sell.fromBase && base != null ? levelCell("base", base, ref, { ...common, when: baseTimeframeOf(pick) }) : "",
+    levelCell("bull", bull, ref, { ...common, when: bullTimeframeOf(pick) }),
+  ].join("");
+  const cond = bull != null ? bullCaseOf(pick) : null;
+  const sub = closed ? "Levels while this lead was open" : "What each price means";
+  return `<section class="plan${compact ? " plan-compact" : ""}${closed ? " plan-closed" : ""}${sell && !sell.fromBase && base != null ? " plan-4" : ""}" aria-label="Trade plan">
+      <div class="plan-head"><span class="plan-t">Trade plan</span><span class="plan-sub">${sub}</span></div>
+      <dl class="levels">${cells}</dl>
+      ${cond ? `<p class="plan-if"><span class="plan-if-k">Bull stretch if</span> ${escapeHtml(cond)}</p>` : ""}
+    </section>`;
 }
 
-function range(pick, current) {
+// Price-range bar. Levels sit in price order; spacing starts proportional to
+// price and is then nudged apart so every label stays readable on a phone.
+// The current price is interpolated between its two neighbouring levels.
+const LADDER_RANK = { stop: 0, entry: 1, sell: 2, base: 3, bull: 4 };
+const LADDER_PAD = 4;
+const LADDER_GAP = 24;
+
+export function rangeModel(pick, current) {
+  const entry = num(pick?.priceAtCall);
+  const sell = autoSellOf(pick);
+  const bull = targetBullOf(pick);
+  if (entry == null || entry <= 0 || (sell == null && bull == null)) return null;
+  const base = targetBaseOf(pick);
+  const levels = [
+    ["stop", stopOf(pick)],
+    ["entry", entry],
+    ["sell", sell ? sell.price : null],
+    ["base", sell && !sell.fromBase ? base : null],
+    ["bull", bull],
+  ]
+    .filter(([, v]) => v != null && v > 0)
+    .map(([k, v]) => ({ k, v, p: 0 }))
+    .sort((a, b) => a.v - b.v || LADDER_RANK[a.k] - LADDER_RANK[b.k]);
+  const n = levels.length;
+  const lo = levels[0].v;
+  const hi = levels[n - 1].v;
+  const inner = 100 - LADDER_PAD * 2;
+  levels.forEach((l, i) => {
+    l.p = LADDER_PAD + (hi > lo ? (l.v - lo) / (hi - lo) : i / (n - 1)) * inner;
+  });
+  const gap = Math.min(LADDER_GAP, inner / (n - 1));
+  for (let i = 1; i < n; i++) levels[i].p = Math.max(levels[i].p, levels[i - 1].p + gap);
+  levels[n - 1].p = Math.min(levels[n - 1].p, 100 - LADDER_PAD);
+  for (let i = n - 2; i >= 0; i--) levels[i].p = Math.min(levels[i].p, levels[i + 1].p - gap);
+  const span = hi - lo || hi * 0.1 || 1;
+  const pos = (v) => {
+    if (v == null || !(v > 0)) return null;
+    const first = levels[0];
+    const last = levels[n - 1];
+    if (v <= first.v) return first.p - Math.min(1, (first.v - v) / (span * 0.25)) * (first.p - 1);
+    if (v >= last.v) return last.p + Math.min(1, (v - last.v) / (span * 0.25)) * (99 - last.p);
+    for (let i = 0; i < n - 1; i++) {
+      const a = levels[i];
+      const b = levels[i + 1];
+      if (v <= b.v) return b.v > a.v ? a.p + ((v - a.v) / (b.v - a.v)) * (b.p - a.p) : b.p;
+    }
+    return last.p;
+  };
+  const round = (v) => (v == null ? null : +v.toFixed(2));
+  for (const l of levels) l.p = round(l.p);
+  const at = (k) => levels.find((l) => l.k === k)?.p ?? null;
+  const now = num(current);
+  return {
+    levels,
+    autoSell: sell,
+    call: at("entry"),
+    stop: at("stop"),
+    sell: at("sell"),
+    base: at("base") ?? at("sell"),
+    bull: at("bull"),
+    now: round(pos(now)),
+    beyond: now == null ? null : (now < lo ? "below" : (now > hi ? "above" : null)),
+  };
+}
+
+function range(pick, current, opts = {}) {
   const m = rangeModel(pick, current);
   if (!m) return "";
+  const closed = !!opts.closed;
   const entry = num(pick.priceAtCall);
-  const base = targetBaseOf(pick);
-  const progress = progressToBase(current, entry, base);
-  let label = "Awaiting price";
-  let mode = "wait";
-  if (current != null && progress != null) {
-    const below = current < entry;
-    const rounded = Math.round(progress);
-    label = below ? `${rounded}% vs call` : (rounded >= 100 ? `${rounded}% · base hit` : `${rounded}% to base`);
-    mode = below ? "neg" : (rounded >= 100 ? "done" : "pos");
-  } else if (current != null) {
-    label = "Tracking toward bull";
-    mode = current >= entry ? "pos" : "neg";
-  }
+  const sell = m.autoSell;
   const stop = stopOf(pick);
-  if (current != null && stop != null && current <= stop) mode = "stop";
-  const scale = base != null
-    ? `Call ${formatPrice(entry)} → Base ${formatPrice(base)}`
-    : `Call ${formatPrice(entry)} → Bull ${formatPrice(targetBullOf(pick))}`;
-  const markers = [["stop", "Stop", m.stop], ["call", "Call", m.call], ["base", "Base", m.base], ["bull", "Bull", m.bull]]
-    .filter(([, , p]) => p != null)
-    .sort((a, b) => a[2] - b[2]);
-  let lastLow = -99;
-  let lastHigh = -99;
-  const labels = markers.map(([k, text, p]) => {
-    let row = "low";
-    if (p - lastLow < 15) row = p - lastHigh < 15 ? "low" : "high";
-    if (row === "low") lastLow = p;
-    else lastHigh = p;
-    return `<span class="rl rl-${k} rl-${row}" style="--p:${p}">${text}</span>`;
+  let mode = "wait";
+  if (current != null) {
+    if (!closed && stop != null && current <= stop) mode = "stop";
+    else if (sell && current >= sell.price) mode = "hit";
+    else mode = current >= entry ? "up" : "down";
+  }
+  const nowName = closed ? "Closed" : "Now";
+  const labels = m.levels.map(({ k, v, p }) => {
+    const info = levelInfo(k, sell);
+    const extra = k === "sell" && sell.fromBase ? '<span class="rb-x"> (base)</span>' : "";
+    const tip = `${info.name}: ${info.cue}${info.more ? `. ${info.more}` : ""}`;
+    return `<span class="rb-l rb-l-${k}" style="--p:${p}" title="${escapeHtml(tip)}"><span class="rb-n">${escapeHtml(info.short)}${extra}</span><span class="rb-v">${escapeHtml(formatPrice(v))}</span></span>`;
   }).join("");
-  const ticks = markers.map(([k, , p]) => `<i class="rm rm-${k}" style="--p:${p}"></i>`).join("");
+  const marks = m.levels.map(({ k, p }) => `<i class="rb-m rb-m-${k}" style="--p:${p}"></i>`).join("");
+  const risk = m.stop != null ? `<span class="rb-zone rb-zone-risk" style="--a:0;--b:${m.stop}"></span>` : "";
+  const goalStart = m.sell ?? m.bull;
+  const goal = `<span class="rb-zone rb-zone-goal" style="--a:${goalStart};--b:100"></span>`;
   let fill = "";
   let head = "";
+  let tag;
   if (m.now != null) {
     const l = Math.min(m.call, m.now);
     const w = Math.abs(m.now - m.call);
     const dir = m.now >= m.call ? "up" : "down";
-    fill = `<span class="range-fill fill-${dir}" style="--l:${l};--w:${w.toFixed(2)};--c:${m.call}"><span class="shimmer"></span></span>`;
-    head = `<span class="range-rail" style="--p:${m.now};--c:${m.call}"><i class="range-dot"></i></span>`;
+    fill = `<span class="rb-fill fill-${dir}" style="--l:${l};--w:${w.toFixed(2)};--c:${m.call}"></span>`;
+    head = `<span class="rb-rail" style="--p:${m.now};--c:${m.call}"><i class="rb-dot"></i></span>`;
+    const edge = m.beyond === "below" ? "◂ " : "";
+    const edgeR = m.beyond === "above" ? " ▸" : "";
+    tag = `<span class="rb-now" style="--p:${m.now}">${edge}<span class="rb-now-k">${nowName}</span> ${escapeHtml(formatPrice(current))}${edgeR}</span>`;
+  } else {
+    tag = `<span class="rb-now rb-now-wait" style="--p:${m.call}"><span class="rb-now-k">Now</span> awaiting quote</span>`;
   }
-  const stopZone = m.stop != null ? `<span class="zone zone-stop" style="--a:0;--b:${m.stop}"></span>` : "";
-  const goalStart = m.base ?? m.bull;
-  const goalZone = `<span class="zone zone-goal" style="--a:${goalStart};--b:100"></span>`;
-  return `<div class="range range-${mode}">
-    <div class="range-head"><span class="range-label">${escapeHtml(label)}</span><span class="range-scale">${escapeHtml(scale)}</span></div>
-    <div class="range-track" role="img" aria-label="${escapeHtml(`${label}. ${scale}`)}">${stopZone}${goalZone}${ticks}${fill}${head}</div>
-    <div class="range-labels" aria-hidden="true">${labels}</div>
-  </div>`;
-}
-
-function levelCell(label, level, current, cls) {
-  if (num(level) == null) {
-    return `<div class="level ${cls}"><dt>${label}</dt><dd><span class="lv-v">—</span></dd></div>`;
-  }
-  const dist = distancePhrase(level, current);
-  return `<div class="level ${cls}"><dt>${label}</dt><dd><span class="lv-v">${escapeHtml(formatPrice(level))}</span>${dist ? `<span class="dist">${escapeHtml(dist)}</span>` : ""}</dd></div>`;
+  const spoken = m.levels.map(({ k, v }) => ({ v, t: `${levelInfo(k, sell).name} ${formatPrice(v)}` }));
+  if (current != null) spoken.push({ v: current + 1e-9, t: `${nowName.toLowerCase()} ${formatPrice(current)}` });
+  const aria = `Price range, low to high: ${spoken.sort((a, b) => a.v - b.v).map((s) => s.t).join(", ")}${current == null ? ". Awaiting a quote" : ""}`;
+  return `<div class="rb rb-${mode}${closed ? " rb-closed" : ""}">
+      <div class="rb-top" aria-hidden="true">${tag}</div>
+      <div class="rb-track" role="img" aria-label="${escapeHtml(aria)}">${risk}${goal}${fill}${marks}${head}</div>
+      <div class="rb-labels" aria-hidden="true">${labels}</div>
+    </div>`;
 }
 
 function blurb(label, text) {
@@ -822,7 +905,7 @@ function renderLead(pick, ctx) {
   const moveHtml = move == null
     ? '<span class="awaiting">awaiting price</span>'
     : animNum(`${key}:move`, move, "pct", formatPct(move), pctClass(move), { count: true });
-  const moveSummary = current == null ? "" : `<p class="now-move">${moveHtml}</p>`;
+  const moveSummary = current == null ? "" : `<p class="now-move">${moveHtml}<span class="now-move-k"> since entry</span></p>`;
   const held = daysHeld(pick, ctx.today);
   const summary = `
     <button type="button" class="lead-toggle" data-expand="${escapeHtml(key)}" aria-expanded="${expanded ? "true" : "false"}" aria-controls="${id}-detail" id="${id}-toggle">
@@ -837,8 +920,8 @@ function renderLead(pick, ctx) {
           ${moveSummary}
         </div>
       </div>
-      ${compactLevels(pick)}
-      <span class="lead-chev" aria-hidden="true">${ICONS.chev}</span>
+      ${compactLevels(pick, current)}
+      <span class="lead-more" aria-hidden="true"><span class="lm-closed">Trade plan, thesis &amp; sources</span><span class="lm-open">Hide details</span>${ICONS.chev}</span>
     </button>`;
   const detail = `
     <div class="lead-detail-wrap" id="${id}-detail"${expanded ? "" : " inert"}>
@@ -846,16 +929,9 @@ function renderLead(pick, ctx) {
         ${chips(pick, current, pending)}
         ${projection(pick, current)}
         <dl class="quote">
-          <div><dt>Called at</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
-          <div><dt>Since called</dt><dd><span class="q-v">${move == null ? '<span class="awaiting">awaiting price</span>' : animNum(`${key}:move-d`, move, "pct", formatPct(move), pctClass(move))}</span><span class="q-sub">move, for context</span></dd></div>
+          <div><dt>Entry</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">called ${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
+          <div><dt>Since entry</dt><dd><span class="q-v">${move == null ? '<span class="awaiting">awaiting price</span>' : animNum(`${key}:move-d`, move, "pct", formatPct(move), pctClass(move))}</span><span class="q-sub">move, for context</span></dd></div>
           <div><dt>Today</dt><dd><span class="q-v">${day == null ? '<span class="flat">—</span>' : animNum(`${key}:day-d`, day, "pct", formatPct(day), `pill ${pctClass(day)}`)}</span><span class="q-sub">day change</span></dd></div>
-        </dl>
-        ${chart(pick, current, id)}
-        ${range(pick, current)}
-        <dl class="levels">
-          ${levelCell("Stop", stopOf(pick), current, "lv-stop")}
-          ${levelCell("Base", targetBaseOf(pick), current, "lv-base")}
-          ${levelCell("Bull", targetBullOf(pick), current, "lv-bull")}
         </dl>
         <div class="notes">
           ${blurb("Thesis", displayThesis(pick) || "—")}
@@ -904,8 +980,8 @@ function renderArchived(pick, ctx) {
           <p class="now-move">${moveHtml}</p>
         </div>
       </div>
-      ${compactLevels(pick)}
-      <span class="lead-chev" aria-hidden="true">${ICONS.chev}</span>
+      ${compactLevels(pick, exit, { closed: true })}
+      <span class="lead-more" aria-hidden="true"><span class="lm-closed">Trade plan, notes &amp; sources</span><span class="lm-open">Hide details</span>${ICONS.chev}</span>
     </button>`;
   const detail = `
     <div class="lead-detail-wrap" id="${id}-detail"${expanded ? "" : " inert"}>
@@ -913,9 +989,9 @@ function renderArchived(pick, ctx) {
         ${chips(pick, exit, pending)}
         ${projection(pick, exit, true)}
         <dl class="quote quote-4">
-          <div><dt>Called at</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
+          <div><dt>Entry</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.priceAtCall))}</span><span class="q-sub">called ${escapeHtml(formatDay(pick.dateCalled))}</span></dd></div>
           <div><dt>Closed</dt><dd><span class="q-v">${escapeHtml(formatPrice(pick.exitPrice))}</span><span class="q-sub">${escapeHtml(formatDay(pick.exitDate))}</span></dd></div>
-          <div><dt>Call → close</dt><dd><span class="q-v">${moveHtml}</span><span class="q-sub">move</span></dd></div>
+          <div><dt>Entry → close</dt><dd><span class="q-v">${moveHtml}</span><span class="q-sub">move</span></dd></div>
           <div><dt>Listed</dt><dd><span class="q-v">${escapeHtml(formatDays(daysHeld(pick, ctx.today)))}</span><span class="q-sub">on the feed</span></dd></div>
         </dl>
         <div class="notes">
@@ -968,7 +1044,7 @@ function renderStopped(stopped) {
         ${ICONS.chev}
       </summary>
       <div class="stopped-body">
-        <p class="stopped-note">Dropped after a daily close at or below the stop. A ticker can come back later if a new setup appears.</p>
+        <p class="stopped-note">Dropped after a daily close at or below its stop loss. A ticker can come back later if a new setup appears.</p>
         <ul class="stopped-list">${items}</ul>
       </div>
     </details>
@@ -1205,7 +1281,7 @@ function snapshot() {
 
 function burstAt(lead) {
   const card = lead.querySelector(".card");
-  const dot = lead.querySelector(".range-dot") || lead.querySelector(".end-dot");
+  const dot = lead.querySelector(".rb-dot");
   if (!card || !dot) return;
   const c = card.getBoundingClientRect();
   const d = dot.getBoundingClientRect();
@@ -1253,11 +1329,12 @@ function introDelay() {
   return Math.max(0, 0.85 - intro.time());
 }
 
-const FROM_CARD = { autoAlpha: 0, y: 70, rotateX: -18, scale: 0.94, filter: "blur(14px)", transformPerspective: 1200, transformOrigin: "50% 0%" };
-const TO_CARD = { autoAlpha: 1, y: 0, rotateX: 0, scale: 1, filter: "blur(0px)", duration: 1.15, ease: "expo.out", clearProps: "transform,opacity,visibility,filter" };
+// Flat, calm entrance: a short rise and fade. No rotation or perspective.
+const FROM_CARD = { autoAlpha: 0, y: 22 };
+const TO_CARD = { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity,visibility" };
 
-// First paint with data: cards rise in with a 3D blur-to-sharp stagger, then
-// meters fill, paths draw and numbers count. Archive cards reveal on scroll.
+// First paint with data: cards rise in with a gentle stagger, then range bars
+// fill, paths draw and numbers count. Archive cards reveal on scroll.
 function entrance(board) {
   const motion = canAnimate();
   const active = [...board.querySelectorAll(".block-active .lead")];
@@ -1286,26 +1363,26 @@ function entrance(board) {
   if (g) {
     if (heads.length) g.fromTo(heads, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: "expo.out", stagger: 0.08, delay, clearProps: "transform,opacity,visibility" });
     if (active.length) {
-      g.fromTo(active, FROM_CARD, { ...TO_CARD, stagger: 0.09, delay: delay + 0.08 });
+      g.fromTo(active, FROM_CARD, { ...TO_CARD, stagger: 0.06, delay: delay + 0.08 });
     }
   } else {
     heads.forEach((el) => el.animate([{ opacity: 0, transform: "translateY(16px)" }, { opacity: 1, transform: "none" }], { duration: 800, easing: EASE, fill: "backwards", delay: delay * 1000 }));
     active.forEach((el, i) => el.animate(
-      [{ opacity: 0, transform: "translateY(50px) scale(0.96)" }, { opacity: 1, transform: "none" }],
-      { duration: 1000, easing: EASE, fill: "backwards", delay: (delay + 0.08 + i * 0.09) * 1000 },
+      [{ opacity: 0, transform: "translateY(22px)" }, { opacity: 1, transform: "none" }],
+      { duration: 800, easing: EASE, fill: "backwards", delay: (delay + 0.08 + i * 0.06) * 1000 },
     ));
   }
-  active.forEach((el, i) => queueReveal(() => reveal(el), delay + 0.4 + i * 0.09));
+  active.forEach((el, i) => queueReveal(() => reveal(el), delay + 0.35 + i * 0.06));
 
   if (scrollTriggerReady()) {
     archive.forEach((el) => {
-      window.gsap.set(el, { autoAlpha: 0, y: 60 });
+      window.gsap.set(el, { autoAlpha: 0, y: 24 });
       window.ScrollTrigger.create({
         trigger: el,
         start: "top 92%",
         once: true,
         onEnter: () => {
-          window.gsap.fromTo(el, { autoAlpha: 0, y: 60, filter: "blur(10px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1, ease: "expo.out", clearProps: "transform,opacity,visibility,filter" });
+          window.gsap.fromTo(el, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity,visibility" });
           setTimeout(() => reveal(el, false), 250);
         },
       });
@@ -1340,9 +1417,9 @@ function slideIn(el, i) {
   if (lead) lead.classList.add("is-pre");
   const g = gsapReady() ? window.gsap : null;
   if (g) {
-    g.fromTo(el, { autoAlpha: 0, x: -40, scale: 0.95, filter: "blur(12px)" }, { autoAlpha: 1, x: 0, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "expo.out", delay: i * 0.08, clearProps: "transform,opacity,visibility,filter" });
+    g.fromTo(el, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", delay: i * 0.08, clearProps: "transform,opacity,visibility" });
   } else {
-    el.animate([{ opacity: 0, transform: "translateX(-30px) scale(0.96)" }, { opacity: 1, transform: "none" }], { duration: 800, easing: EASE, delay: i * 80, fill: "backwards" });
+    el.animate([{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }], { duration: 700, easing: EASE, delay: i * 80, fill: "backwards" });
   }
   if (lead) {
     addTransient(lead, "is-new", 3200);
@@ -1364,9 +1441,9 @@ function removeAnimated(el, board) {
   }
   const g = gsapReady() ? window.gsap : null;
   if (g) {
-    g.to(el, { autoAlpha: 0, scale: 0.88, y: -16, rotateX: 12, filter: "blur(12px) saturate(0)", duration: 0.6, ease: "power3.in", onComplete: done });
+    g.to(el, { autoAlpha: 0, y: -10, filter: "saturate(0)", duration: 0.45, ease: "power2.in", onComplete: done });
   } else {
-    el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.9) translateY(-12px)" }], { duration: 500, easing: "ease-in", fill: "forwards" }).onfinish = done;
+    el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-10px)" }], { duration: 450, easing: "ease-in", fill: "forwards" }).onfinish = done;
   }
 }
 
@@ -1457,6 +1534,7 @@ function render(kind = "data") {
   if (select && select.value !== state.sort) select.value = state.sort;
   patchStatus();
   tickCountdown();
+  layoutRangeLabels(board);
   if (!state.loaded) return;
 
   if (first) {
@@ -1471,6 +1549,41 @@ function render(kind = "data") {
   const next = snapshot();
   seen = { ready: true, ...next, updated };
   setMood(m);
+}
+
+// Range-bar labels: spacing keeps them apart in normal cases; if long prices on
+// a narrow card would still touch, drop the crowded label to a second row.
+// Runs after every render (the morph resets classes), on resize and once
+// webfonts settle.
+function layoutRangeLabels(root = document) {
+  for (const row of root.querySelectorAll(".rb-labels")) {
+    const labels = [...row.children];
+    for (const el of labels) el.classList.remove("rb-l-low");
+    let stacked = false;
+    let right = -Infinity;
+    let lowRight = -Infinity;
+    for (const el of labels) {
+      const r = el.getBoundingClientRect();
+      if (!r.width) continue;
+      if (r.left < right + 6 && r.left >= lowRight + 6) {
+        el.classList.add("rb-l-low");
+        lowRight = r.right;
+        stacked = true;
+      } else {
+        right = r.right;
+      }
+    }
+    row.classList.toggle("is-stacked", stacked);
+  }
+}
+
+let rangeFrame = 0;
+function queueRangeLayout() {
+  if (rangeFrame) return;
+  rangeFrame = requestAnimationFrame(() => {
+    rangeFrame = 0;
+    layoutRangeLabels();
+  });
 }
 
 // Aurora tint follows the average day change of active leads (market mood).
@@ -1925,7 +2038,7 @@ function playIntro() {
   }
   if (!gsapReady()) {
     root.classList.remove("intro-pending");
-    const items = document.querySelectorAll(".topbar, .hero-main > *, .hero-side .meta, #summary .stat, .tape");
+    const items = document.querySelectorAll(".topbar, .hero-main > *, .hero-side .meta, #summary .stat, .tape, .legend");
     items.forEach((el, i) => el.animate(
       [{ opacity: 0, transform: "translateY(18px)" }, { opacity: 1, transform: "none" }],
       { duration: 900, easing: EASE, delay: i * 60, fill: "backwards" },
@@ -1946,8 +2059,9 @@ function playIntro() {
     .fromTo(".wordmark .wm-sub", { autoAlpha: 0, x: -24 }, { autoAlpha: 1, x: 0, duration: 1.1 }, 0.45)
     .fromTo(".tagline", { autoAlpha: 0, y: 18, filter: "blur(8px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1, clearProps: "filter" }, 0.55)
     .fromTo(".hero-side .meta, .hero-side .status-note", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 1 }, 0.5)
-    .fromTo("#summary .stat", { autoAlpha: 0, y: 40, rotateX: -32, filter: "blur(12px)", transformPerspective: 900, transformOrigin: "50% 100%" },
-      { autoAlpha: 1, y: 0, rotateX: 0, filter: "blur(0px)", duration: 1.2, stagger: 0.08, clearProps: "transform,filter" }, 0.55)
+    .fromTo("#summary .stat", { autoAlpha: 0, y: 16 },
+      { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.06, clearProps: "transform" }, 0.55)
+    .fromTo(".legend", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.9, clearProps: "transform" }, 0.7)
     .fromTo(".tape", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 1, clearProps: "transform" }, 0.8)
     .fromTo("#board", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, 0.75);
   intro = tl;
@@ -2097,7 +2211,8 @@ function boot() {
   document.addEventListener("change", onChange);
   document.addEventListener("click", onClick);
   document.addEventListener("toggle", onToggle, true);
-  installTilt(".lead .card");
+  // Flat cursor spotlight only: cards never tilt or rotate on hover.
+  installSpotlight(".lead .card");
   installMagnetic();
   installRipple();
   setupModal();
@@ -2114,6 +2229,9 @@ function boot() {
     bg = null;
   }
   if (!bg) document.documentElement.classList.add("no-webgl");
+
+  window.addEventListener("resize", queueRangeLayout, { passive: true });
+  document.fonts?.ready?.then(queueRangeLayout);
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") poll();

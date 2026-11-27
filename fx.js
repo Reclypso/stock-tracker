@@ -1,7 +1,7 @@
 // Motion + DOM toolkit for the leads page: keyed morphing (so polls patch the
-// page instead of rebuilding it), count-ups, odometer digit rolls, bursts,
-// tilt/spotlight, magnetic buttons and tap ripples. No dependencies; GSAP is
-// used by app.js only when it loaded.
+// page instead of rebuilding it), count-ups, odometer digit rolls, bursts, a
+// flat card spotlight (no tilt), magnetic buttons and tap ripples. No
+// dependencies; GSAP is used by app.js only when it loaded.
 
 export const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
@@ -47,7 +47,7 @@ function syncAttrs(from, to) {
   }
   for (const { name } of [...from.attributes]) {
     if (to.hasAttribute(name)) continue;
-    // Inline styles written by JS (tilt, GSAP, countdowns) stay unless the
+    // Inline styles written by JS (spotlight, GSAP, countdowns) stay unless the
     // template sets its own. <details open> belongs to the user.
     if (name === "style" || (details && name === "open")) continue;
     from.removeAttribute(name);
@@ -229,45 +229,32 @@ export function burst(host, x, y, colors = ["#ffd36b", "#fff1c2", "#9b7bff", "#2
 }
 
 // ---------------------------------------------------------------------------
-// Pointer effects (fine pointers only): 3D tilt + spotlight on cards,
+// Pointer effects (fine pointers only): a flat cursor spotlight on cards,
 // magnetic pull on [data-magnetic]. Tap ripples everywhere.
+//
+// Cards never rotate, tilt or take a perspective transform on hover (it made
+// people motion-sick). The spotlight only moves a soft radial highlight via
+// --mx/--my; the card itself stays put apart from a CSS hover lift of 2px.
 
-export function installTilt(selector) {
+export function installSpotlight(selector) {
   if (!finePointer() || reducedMotion()) return;
-  let active = null;
   let frame = 0;
   let pending = null;
   const apply = () => {
     frame = 0;
     if (!pending) return;
-    const { el, x, y, w, h } = pending;
-    const rx = ((y / h) - 0.5) * -7;
-    const ry = ((x / w) - 0.5) * 9;
-    el.style.setProperty("--mx", `${x}px`);
-    el.style.setProperty("--my", `${y}px`);
-    el.style.transform = `perspective(1100px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateZ(0)`;
+    const { el, x, y } = pending;
+    el.style.setProperty("--mx", `${Math.round(x)}px`);
+    el.style.setProperty("--my", `${Math.round(y)}px`);
   };
   document.addEventListener("pointermove", (event) => {
     if (event.pointerType !== "mouse") return;
     const el = event.target.closest?.(selector);
-    if (active && active !== el) {
-      active.classList.remove("is-tilting");
-      active.style.transform = "";
-    }
-    active = el || null;
     if (!el) return;
-    el.classList.add("is-tilting");
     const rect = el.getBoundingClientRect();
-    pending = { el, x: event.clientX - rect.left, y: event.clientY - rect.top, w: rect.width, h: rect.height };
+    pending = { el, x: event.clientX - rect.left, y: event.clientY - rect.top };
     if (!frame) frame = requestAnimationFrame(apply);
   }, { passive: true });
-  document.addEventListener("pointerleave", () => {
-    if (active) {
-      active.classList.remove("is-tilting");
-      active.style.transform = "";
-      active = null;
-    }
-  });
 }
 
 export function installMagnetic() {
