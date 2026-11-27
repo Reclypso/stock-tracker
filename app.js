@@ -2253,7 +2253,7 @@ function applyWantedPlayback() {
       return;
     }
     if (typeof player.unMute === "function") player.unMute();
-    if (typeof player.setVolume === "function") player.setVolume(100);
+    if (typeof player.setVolume === "function") player.setVolume(30);
     if (typeof player.playVideo === "function") player.playVideo();
   } catch {
     // Autoplay may reject until a user gesture; the unlock path retries.
@@ -2452,10 +2452,9 @@ function unlockClickAudio() {
   if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
 }
 
-// Short woody iPod click-wheel tick: ~10ms noise impulse + a soft body tone.
-// Volume stays low so it sits under the background loop instead of stabbing it.
+// Crisp iPod click-wheel tick balanced to cut cleanly over the 30% background loop.
 function playSnapClick() {
-  if (!sound.wantOn || !sound.unlocked) return false;
+  if (!sound.wantOn) return false;
   const now = typeof performance !== "undefined" ? performance.now() : Date.now();
   if (now - snap.lastAt < SNAP_CLICK_COOLDOWN_MS) return false;
   const ctx = ensureClickContext();
@@ -2467,45 +2466,42 @@ function playSnapClick() {
 
   const t0 = ctx.currentTime;
   const master = ctx.createGain();
-  master.gain.value = 0.4;
-  const shelf = ctx.createBiquadFilter();
-  shelf.type = "highshelf";
-  shelf.frequency.value = 6200;
-  shelf.gain.value = -7;
-  shelf.connect(master);
+  master.gain.value = 0.9;
   master.connect(ctx.destination);
 
+  // Tactile woody click body
   const osc = ctx.createOscillator();
   osc.type = "triangle";
-  osc.frequency.setValueAtTime(1180, t0);
-  osc.frequency.exponentialRampToValueAtTime(680, t0 + 0.012);
+  osc.frequency.setValueAtTime(1450, t0);
+  osc.frequency.exponentialRampToValueAtTime(520, t0 + 0.02);
   const body = ctx.createGain();
   body.gain.setValueAtTime(0.0001, t0);
-  body.gain.exponentialRampToValueAtTime(0.065, t0 + 0.001);
-  body.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.014);
+  body.gain.exponentialRampToValueAtTime(0.42, t0 + 0.0015);
+  body.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.024);
   osc.connect(body);
-  body.connect(shelf);
+  body.connect(master);
   osc.start(t0);
-  osc.stop(t0 + 0.016);
+  osc.stop(t0 + 0.026);
 
-  const nLen = Math.max(1, Math.floor(ctx.sampleRate * 0.01));
+  // Crisp mechanical click-wheel transient
+  const nLen = Math.max(1, Math.floor(ctx.sampleRate * 0.016));
   const buf = ctx.createBuffer(1, nLen, ctx.sampleRate);
   const data = buf.getChannelData(0);
-  for (let i = 0; i < nLen; i++) data[i] = (Math.random() * 2 - 1) * Math.exp((-i / nLen) * 6);
+  for (let i = 0; i < nLen; i++) data[i] = (Math.random() * 2 - 1) * Math.exp((-i / nLen) * 5);
   const noise = ctx.createBufferSource();
   noise.buffer = buf;
   const bp = ctx.createBiquadFilter();
   bp.type = "bandpass";
-  bp.frequency.value = 2350;
-  bp.Q.value = 2.3;
+  bp.frequency.value = 2600;
+  bp.Q.value = 1.6;
   const tick = ctx.createGain();
-  tick.gain.setValueAtTime(0.1, t0);
-  tick.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.011);
+  tick.gain.setValueAtTime(0.55, t0);
+  tick.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.016);
   noise.connect(bp);
   bp.connect(tick);
-  tick.connect(shelf);
+  tick.connect(master);
   noise.start(t0);
-  noise.stop(t0 + 0.012);
+  noise.stop(t0 + 0.018);
 
   snap.plays += 1;
   snap.lastAt = now;
