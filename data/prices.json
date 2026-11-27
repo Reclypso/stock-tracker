@@ -1,47 +1,53 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 0.37,
+      "changePct": 0.12,
       "prevClose": 75.67,
-      "price": 75.95,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 75.76,
+      "time": "2026-11-27T16:57:03Z"
     },
     "AFG": {
       "changePct": 0.15,
       "prevClose": 160.89,
-      "price": 161.13,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 161.135,
+      "time": "2026-11-27T16:57:03Z"
+    },
+    "ANF": {
+      "changePct": 4.12,
+      "prevClose": 176.9,
+      "price": 184.19,
+      "time": "2026-11-27T16:57:03Z"
     },
     "CARL": {
-      "changePct": 0.43,
+      "changePct": 4.92,
       "prevClose": 18.77,
-      "price": 18.85,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 19.6943,
+      "time": "2026-11-27T16:57:03Z"
     },
     "FROG": {
-      "changePct": 3.13,
+      "changePct": 5.53,
       "prevClose": 104.0,
-      "price": 107.26,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 109.75,
+      "time": "2026-11-27T16:57:03Z"
     },
     "TLS": {
-      "changePct": 3.37,
+      "changePct": 6.49,
       "prevClose": 7.94,
-      "price": 8.2079,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 8.455,
+      "time": "2026-11-27T16:57:03Z"
     },
     "VNDA": {
-      "changePct": 0.76,
+      "changePct": 3.56,
       "prevClose": 3.93,
-      "price": 3.96,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 4.07,
+      "time": "2026-11-27T16:57:03Z"
     },
     "XERS": {
-      "changePct": 2.63,
+      "changePct": 4.39,
       "prevClose": 17.1,
-      "price": 17.55,
-      "time": "2026-11-27T14:54:29Z"
+      "price": 17.85,
+      "time": "2026-11-27T16:57:03Z"
     }
   },
-  "updated": "2026-11-27T14:54:29Z"
+  "updated": "2026-11-27T16:57:03Z"
 }
