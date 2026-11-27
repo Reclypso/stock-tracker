@@ -37,6 +37,8 @@
   --f-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --pad: max(16px, env(safe-area-inset-left));
+  /* Sticky topbar (~62px) + a little air so snapped cards sit cleanly below it. */
+  --snap-pad: 76px;
 }
 
 * { box-sizing: border-box; }
@@ -47,6 +49,15 @@ html {
   scrollbar-color: rgba(155, 123, 255, 0.45) transparent;
   scrollbar-width: thin;
   scroll-behavior: smooth;
+  scroll-padding-top: var(--snap-pad);
+  scroll-snap-type: y mandatory;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* Long expanded trade plans must be readable without snapping back to the card top. */
+html.has-expanded-card {
+  scroll-snap-type: y proximity;
 }
 
 body {
@@ -62,6 +73,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 ::selection { background: rgba(155, 123, 255, 0.45); color: #fff; }
@@ -395,6 +407,7 @@ button { font: inherit; color: inherit; }
   padding: 34px 20px 28px;
   display: grid;
   gap: 26px;
+  scroll-snap-align: start;
 }
 
 .hero-frame { position: absolute; inset: 0; pointer-events: none; }
@@ -547,6 +560,7 @@ button { font: inherit; color: inherit; }
   padding: 16px 18px 18px;
   display: grid;
   gap: 14px;
+  scroll-snap-align: start;
   border-radius: 16px;
   border: 1px solid var(--line-2);
   background: linear-gradient(170deg, rgba(16, 20, 42, 0.82), rgba(8, 10, 22, 0.86));
@@ -742,6 +756,7 @@ button { font: inherit; color: inherit; }
 /* ------------------------------------------------------------------ Sections */
 
 .board { margin-top: 44px; }
+.block { scroll-snap-align: start; }
 .block + .block { margin-top: 56px; }
 .loading { color: var(--ink-3); padding: 40px 0; text-align: center; }
 
@@ -846,6 +861,13 @@ button { font: inherit; color: inherit; }
   --tone-rgb: var(--cyan-rgb);
   position: relative;
   min-width: 0;
+  scroll-snap-align: start;
+}
+
+/* Phone / single-column: a fast swipe lands on the next card, not three later.
+   Desktop 2-col rows already share a top edge, so they lock row-by-row. */
+@media (max-width: 899px) {
+  .lead { scroll-snap-stop: always; }
 }
 .tone-up { --tone: var(--up); --tone-rgb: var(--up-rgb); }
 .tone-down { --tone: var(--down); --tone-rgb: var(--down-rgb); }
@@ -2186,7 +2208,7 @@ button { font: inherit; color: inherit; }
 /* ------------------------------------------------------------------ Reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html, html.has-expanded-card { scroll-behavior: auto; scroll-snap-type: y proximity; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

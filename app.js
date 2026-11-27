@@ -1549,6 +1549,7 @@ function render(kind = "data") {
   const next = snapshot();
   seen = { ready: true, ...next, updated };
   setMood(m);
+  syncExpandedSnap();
 }
 
 // Range-bar labels: spacing keeps them apart in normal cases; if long prices on
@@ -2153,9 +2154,11 @@ function toggleLead(button) {
   const key = button.getAttribute("data-expand") || article.getAttribute("data-key");
   const open = !article.classList.contains("is-open");
   setLeadOpen(article, open);
-  if (!key) return;
-  if (open) state.expandedKeys.add(key);
-  else state.expandedKeys.delete(key);
+  if (key) {
+    if (open) state.expandedKeys.add(key);
+    else state.expandedKeys.delete(key);
+  }
+  syncExpandedSnap();
 }
 
 // Smooth height open/close; the native <details> still owns state, keyboard
@@ -2360,6 +2363,7 @@ function onSoundToggle(event) {
     applyWantedPlayback();
   }
   paintSoundButton();
+  unlockClickAudio();
 }
 
 function unlockSoundFromGesture(event) {
@@ -2369,6 +2373,211 @@ function unlockSoundFromGesture(event) {
   sound.unlocked = true;
   applyWantedPlayback();
   paintSoundButton();
+  unlockClickAudio();
+}
+
+
+// ---------------------------------------------------------------------------
+// iPod-style snap-and-click scrolling.
+// CSS lock cards (or desktop rows) just under the sticky topbar. A short
+// Web Audio tick plays once per snap change, but never when the header mute
+// is on, and never on the initial page load.
+
+const SNAP_CLICK_COOLDOWN_MS = 90;
+const SNAP_SELECTORS = ".hero, .legend, .block, .lead";
+
+const snap = {
+  armed: false,
+  lastKey: null,
+  plays: 0,
+  lastAt: 0,
+  raf: 0,
+  ctx: null,
+};
+
+function syncSnapPadding() {
+  const bar = document.querySelector(".topbar");
+  if (!bar) return;
+  const pad = Math.round(bar.getBoundingClientRect().height) + 14;
+  document.documentElement.style.setProperty("--snap-pad", `${Math.max(72, pad)}px`);
+}
+
+function syncExpandedSnap() {
+  const open = !!document.querySelector(".lead.is-open");
+  document.documentElement.classList.toggle("has-expanded-card", open);
+}
+
+function snapPadPx() {
+  const n = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop);
+  return Number.isFinite(n) ? n : 76;
+}
+
+function activeSnapKey() {
+  const pad = snapPadPx();
+  const items = [...document.querySelectorAll(SNAP_SELECTORS)].filter(shown);
+  if (!items.length) return null;
+  let best = null;
+  let bestScore = Infinity;
+  for (const el of items) {
+    const dist = el.getBoundingClientRect().top - pad;
+    // Prefer the target already at or just past the snap line.
+    const score = Math.abs(dist) + (dist > 10 ? 24 : 0);
+    if (score < bestScore) {
+      bestScore = score;
+      best = el;
+    }
+  }
+  if (!best) return null;
+  const y = Math.round((best.getBoundingClientRect().top + window.scrollY) / 8) * 8;
+  if (best.classList.contains("lead")) return `lead-row:${y}`;
+  if (best.classList.contains("hero")) return "hero";
+  if (best.classList.contains("legend")) return "legend";
+  return `block:${best.getAttribute("data-key") || y}`;
+}
+
+function ensureClickContext() {
+  if (snap.ctx) return snap.ctx;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  try {
+    snap.ctx = new AC();
+  } catch {
+    snap.ctx = null;
+  }
+  return snap.ctx;
+}
+
+function unlockClickAudio() {
+  const ctx = ensureClickContext();
+  if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
+}
+
+// Short woody iPod click-wheel tick: ~10ms noise impulse + a soft body tone.
+// Volume stays low so it sits under the background loop instead of stabbing it.
+function playSnapClick() {
+  if (!sound.wantOn || !sound.unlocked) return false;
+  const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+  if (now - snap.lastAt < SNAP_CLICK_COOLDOWN_MS) return false;
+  const ctx = ensureClickContext();
+  if (!ctx) return false;
+  if (ctx.state === "suspended") {
+    ctx.resume().catch(() => {});
+    return false;
+  }
+
+  const t0 = ctx.currentTime;
+  const master = ctx.createGain();
+  master.gain.value = 0.4;
+  const shelf = ctx.createBiquadFilter();
+  shelf.type = "highshelf";
+  shelf.frequency.value = 6200;
+  shelf.gain.value = -7;
+  shelf.connect(master);
+  master.connect(ctx.destination);
+
+  const osc = ctx.createOscillator();
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(1180, t0);
+  osc.frequency.exponentialRampToValueAtTime(680, t0 + 0.012);
+  const body = ctx.createGain();
+  body.gain.setValueAtTime(0.0001, t0);
+  body.gain.exponentialRampToValueAtTime(0.065, t0 + 0.001);
+  body.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.014);
+  osc.connect(body);
+  body.connect(shelf);
+  osc.start(t0);
+  osc.stop(t0 + 0.016);
+
+  const nLen = Math.max(1, Math.floor(ctx.sampleRate * 0.01));
+  const buf = ctx.createBuffer(1, nLen, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < nLen; i++) data[i] = (Math.random() * 2 - 1) * Math.exp((-i / nLen) * 6);
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 2350;
+  bp.Q.value = 2.3;
+  const tick = ctx.createGain();
+  tick.gain.setValueAtTime(0.1, t0);
+  tick.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.011);
+  noise.connect(bp);
+  bp.connect(tick);
+  tick.connect(shelf);
+  noise.start(t0);
+  noise.stop(t0 + 0.012);
+
+  snap.plays += 1;
+  snap.lastAt = now;
+  return true;
+}
+
+function noteSnapPosition(fromScroll) {
+  const key = activeSnapKey();
+  if (key == null) return;
+  if (!snap.armed) {
+    snap.lastKey = key;
+    return;
+  }
+  if (key === snap.lastKey) return;
+  snap.lastKey = key;
+  if (fromScroll) playSnapClick();
+}
+
+function onSnapScroll() {
+  if (snap.raf) return;
+  snap.raf = requestAnimationFrame(() => {
+    snap.raf = 0;
+    noteSnapPosition(true);
+  });
+}
+
+function armSnapClicks() {
+  if (snap.armed) return;
+  snap.lastKey = activeSnapKey();
+  snap.armed = true;
+}
+
+function startSnapScroll() {
+  syncSnapPadding();
+  syncExpandedSnap();
+  snap.lastKey = activeSnapKey();
+  window.addEventListener("scroll", onSnapScroll, { passive: true });
+  window.addEventListener("resize", () => {
+    syncSnapPadding();
+    snap.lastKey = activeSnapKey();
+  }, { passive: true });
+  const arm = () => armSnapClicks();
+  window.addEventListener("wheel", arm, { passive: true });
+  window.addEventListener("touchstart", arm, { passive: true });
+  window.addEventListener("keydown", (event) => {
+    if (/^(Arrow(Up|Down)|Page(Up|Down)|Home|End| )$/.test(event.key)) arm();
+  });
+  if (["localhost", "127.0.0.1"].includes(location.hostname)) {
+    window.__snapDebug = {
+      plays: () => snap.plays,
+      key: activeSnapKey,
+      armed: () => snap.armed,
+      arm: armSnapClicks,
+      reset() {
+        snap.plays = 0;
+        snap.lastAt = 0;
+        snap.lastKey = activeSnapKey();
+      },
+      sound: () => ({ wantOn: sound.wantOn, unlocked: sound.unlocked }),
+      setSound(wantOn, unlocked = wantOn) {
+        sound.wantOn = !!wantOn;
+        sound.unlocked = !!unlocked;
+        paintSoundButton();
+        if (sound.wantOn && sound.unlocked) unlockClickAudio();
+      },
+      play: playSnapClick,
+      sync() {
+        syncSnapPadding();
+        syncExpandedSnap();
+      },
+    };
+  }
 }
 
 function startLoopAudio() {
@@ -2400,6 +2609,7 @@ function boot() {
   const board = document.getElementById("board");
   if (!board) return;
   startLoopAudio();
+  startSnapScroll();
   state.sort = loadSort();
   state.filter = loadFilter();
   state.pending = loadPending();
