@@ -4,11 +4,16 @@
 from __future__ import annotations
 
 import math
+import sys
 import unittest
 from datetime import date, datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from check_stops import (
+# Importable from any cwd, e.g. `python3 -m unittest /abs/path/test_check_stops.py`.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from check_stops import (  # noqa: E402
     ET,
     apply_stops,
     close_on_or_before,
@@ -157,8 +162,9 @@ class ApplyStopsTests(unittest.TestCase):
             self.assertEqual(moved, [], msg=repr(kwargs))
 
     def test_short_pick_is_not_stopped_by_close_below_stop(self):
-        # Stop above entry = short. close 9 is below stop 12, must not fire.
-        p = pick(priceAtCall=10.0, stop=12.0)
+        # Shorts must say so explicitly now (stop > entry alone is a long's
+        # lock-in stop). close 9 is below stop 12, must not fire for a short.
+        p = pick(priceAtCall=10.0, stop=12.0, side="short")
         self.assertFalse(is_open_long(p))
         picks, _, _, moved = apply_stops(
             {"picks": [p]}, {"stopped": []}, {"FAKE": 9.0}, date(2026, 11, 9)
@@ -275,6 +281,143 @@ class EligibilityTests(unittest.TestCase):
             {"picks": [p]}, {"stopped": []}, {"FAKE": 7.5}, date(2026, 11, 9)
         )
         self.assertEqual(len(moved), 1)
+
+
+class RaisedStopTests(unittest.TestCase):
+    """Regression for the Nov 26, 2026 audit bug: `is_open_long` used to
+    return `stop < entry`, so a stop raised to breakeven or above silently
+    turned off the automatic stop-out."""
+
+    def run_stops(self, p, close):
+        return apply_stops({"picks": [p]}, {"stopped": []}, {"FAKE": close}, date(2026, 11, 20))
+
+    def test_classic_stop_below_entry_is_long(self):
+        p = pick(priceAtCall=10.0, stop=8.0)
+        self.assertTrue(is_open_long(p))
+        self.assertEqual(len(self.run_stops(p, 7.9)[3]), 1)
+
+    def test_stop_raised_to_entry_still_stops_out(self):
+        p = pick(priceAtCall=10.0, stop=10.0)
+        self.assertTrue(is_open_long(p))
+        picks, stopped, _, moved = self.run_stops(p, 10.0)
+        self.assertEqual(len(moved), 1)
+        self.assertEqual(picks["picks"], [])
+        self.assertEqual(stopped["stopped"][0]["returnPct"], 0.0)
+        # A close above the breakeven stop keeps it open.
+        _, _, _, moved = self.run_stops(p, 10.01)
+        self.assertEqual(moved, [])
+
+    def test_stop_raised_above_entry_locks_in_gain(self):
+        # AAON-style: entry 73.85, stop trailed up to 80 after a run.
+        p = pick(ticker="AAON", id="2026-11-09-AAON", priceAtCall=73.85, stop=80.0)
+        self.assertTrue(is_open_long(p))
+        picks, stopped, _, moved = apply_stops(
+            {"picks": [p]}, {"stopped": []}, {"AAON": 79.5}, date(2026, 11, 20)
+        )
+        self.assertEqual(len(moved), 1)
+        self.assertEqual(picks["picks"], [])
+        self.assertEqual(stopped["stopped"][0]["closePrice"], 79.5)
+        self.assertEqual(stopped["stopped"][0]["returnPct"], 7.65)
+        _, _, _, moved = apply_stops({"picks": [p]}, {"stopped": []}, {"AAON": 85.0}, date(2026, 11, 20))
+        self.assertEqual(moved, [])
+
+    def test_missing_stop_is_not_checked(self):
+        for stop in (None, 0, "", "n/a"):
+            p = pick(stop=stop)
+            self.assertFalse(is_open_long(p), msg=repr(stop))
+            self.assertEqual(self.run_stops(p, 1.0)[3], [], msg=repr(stop))
+        p = pick()
+        del p["stop"]
+        self.assertFalse(is_open_long(p))
+
+    def test_explicit_short_is_never_treated_as_long(self):
+        for stop in (12.0, 8.0, 10.0):
+            p = pick(priceAtCall=10.0, stop=stop, side="short")
+            self.assertFalse(is_open_long(p), msg=stop)
+            self.assertEqual(self.run_stops(p, 5.0)[3], [], msg=stop)
+
+    def test_side_values(self):
+        self.assertTrue(is_open_long(pick(side="long")))
+        self.assertTrue(is_open_long(pick(side=" LONG ")))
+        self.assertTrue(is_open_long(pick(side=None)))
+        self.assertTrue(is_open_long(pick(side="")))
+        self.assertFalse(is_open_long(pick(side="Short")))
+        self.assertFalse(is_open_long(pick(side="sideways")))  # unknown side: leave it alone
+
+    def test_status_must_be_open(self):
+        self.assertTrue(is_open_long(pick(status="Open")))
+        self.assertFalse(is_open_long(pick(status="closed")))
+        self.assertFalse(is_open_long(pick(status=None)))
+
+
+class MainPathOverrideTests(unittest.TestCase):
+    """main() against temp copies with a fake fetcher. Never touches data/."""
+
+    def setUp(self):
+        import json
+        import tempfile
+        from pathlib import Path
+
+        self.json = json
+        self.tmp = tempfile.TemporaryDirectory()
+        base = Path(self.tmp.name)
+        self.picks_path = base / "picks.json"
+        self.stopped_path = base / "stopped.json"
+        self.prices_path = base / "prices.json"
+        be = pick(ticker="BE", id="2026-11-02-BE", priceAtCall=10.0, stop=10.0, calledAt="2026-11-02T15:00:00Z")
+        keep = pick(ticker="KEEP", id="2026-11-02-KEEP", priceAtCall=10.0, stop=8.0, calledAt="2026-11-02T15:00:00Z")
+        self.picks_path.write_text(json.dumps({"picks": [be, keep]}))
+        self.stopped_path.write_text(json.dumps({"stopped": []}))
+        self.prices_path.write_text(json.dumps({"prices": {"BE": {"price": 9.9}, "KEEP": {"price": 9.5}}, "updated": "t"}))
+        self.argv = ["--picks", str(self.picks_path), "--stopped", str(self.stopped_path), "--prices", str(self.prices_path)]
+        self.now = datetime(2026, 11, 20, 22, 0, tzinfo=ET)  # Friday after the close
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    @staticmethod
+    def fetch(ticker):
+        closes = {"BE": 9.95, "KEEP": 9.5}
+        return [(date(2026, 11, 19), 10.5), (date(2026, 11, 20), closes[ticker])]
+
+    def snapshot(self):
+        return [p.read_text() for p in (self.picks_path, self.stopped_path, self.prices_path)]
+
+    def quiet_main(self, argv):
+        import contextlib
+        import io
+
+        from check_stops import main
+
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            code = main(argv, fetch=self.fetch, now=self.now)
+        return code, out.getvalue()
+
+    def test_dry_run_writes_nothing(self):
+        before = self.snapshot()
+        code, out = self.quiet_main(self.argv + ["--dry-run"])
+        self.assertEqual(code, 0)
+        self.assertIn("STOPPED_TICKERS=BE", out)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_breakeven_stop_moves_pick_in_temp_files(self):
+        code, out = self.quiet_main(self.argv)
+        self.assertEqual(code, 0)
+        self.assertIn("STOPPED_TICKERS=BE", out)
+        picks = self.json.loads(self.picks_path.read_text())["picks"]
+        stopped = self.json.loads(self.stopped_path.read_text())["stopped"]
+        prices = self.json.loads(self.prices_path.read_text())["prices"]
+        self.assertEqual([p["ticker"] for p in picks], ["KEEP"])
+        self.assertEqual(stopped[0]["pick"]["ticker"], "BE")
+        self.assertEqual(stopped[0]["closePrice"], 9.95)
+        self.assertEqual(set(prices), {"KEEP"})
+
+    def test_default_paths_are_production(self):
+        from check_stops import PICKS_PATH, PRICES_PATH, STOPPED_PATH, parse_args
+
+        args = parse_args([])
+        self.assertEqual((args.picks, args.stopped, args.prices), (PICKS_PATH, STOPPED_PATH, PRICES_PATH))
+        self.assertFalse(args.dry_run)
 
 
 if __name__ == "__main__":

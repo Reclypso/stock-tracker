@@ -4,10 +4,19 @@ session's official daily close is at or below the stop.
 
 Uses daily closes only — never intraday wicks — and never removes a pick
 because of missing, zero, or otherwise invalid price data.
+
+A pick is a long unless it says `"side": "short"`; its stop is honored
+wherever it sits (below, at, or above entry), so trailing a stop up to
+breakeven or a lock-in level keeps the automatic stop-out armed.
+
+    python scripts/check_stops.py                      # production (GitHub Actions)
+    python scripts/check_stops.py --picks /tmp/p.json --stopped /tmp/s.json \
+        --prices /tmp/pr.json [--dry-run]              # testing on copies
 """
 
 from __future__ import annotations
 
+import argparse
 import io
 import json
 import math
@@ -96,16 +105,35 @@ def usable_number(value) -> float | None:
     return num
 
 
+OPEN_STATUSES = {"open"}
+
+
+def is_open_status(pick: dict) -> bool:
+    return isinstance(pick, dict) and str(pick.get("status") or "").strip().lower() in OPEN_STATUSES
+
+
+def side_of(pick: dict) -> str:
+    """Explicit `side`, defaulting to "long" (every pick before Nov 26, 2026 is a long)."""
+    raw = pick.get("side") if isinstance(pick, dict) else None
+    text = str(raw).strip().lower() if raw is not None else ""
+    return text or "long"
+
+
 def is_open_long(pick: dict) -> bool:
-    if not isinstance(pick, dict) or pick.get("status") != "open":
+    """Open, long (explicit or default), with a usable stop and entry.
+
+    The stop may sit below, at, or above the entry: raising a stop to
+    breakeven or locking in a gain must keep the automatic stop-out armed.
+    Only an explicit `side` other than "long" (e.g. "short") opts out.
+    Picks with no usable stop or entry are left alone.
+    """
+    if not is_open_status(pick):
+        return False
+    if side_of(pick) != "long":
         return False
     stop = usable_number(pick.get("stop"))
     entry = usable_number(pick.get("priceAtCall"))
-    # Longs only: a short's stop sits above entry, and close <= stop would
-    # almost always fire. Picks with no usable stop or entry are left alone.
-    if stop is None or entry is None:
-        return False
-    return stop < entry
+    return stop is not None and entry is not None
 
 
 def ticker_of(pick: dict) -> str:
@@ -306,7 +334,7 @@ def apply_stops(
     open_tickers = {
         ticker_of(pick)
         for pick in remaining
-        if isinstance(pick, dict) and pick.get("status") == "open" and ticker_of(pick)
+        if is_open_status(pick) and ticker_of(pick)
     }
     new_prices = prune_prices(prices_doc or {}, open_tickers, now or utc_now_iso())
     return new_picks, new_stopped, new_prices, moved
@@ -330,23 +358,44 @@ def collect_closes(tickers: list[str], session: date, fetch=fetch_daily_bars) ->
     return closes
 
 
-def main() -> int:
-    picks_doc = load_json(PICKS_PATH, None, required=True)
-    stopped_doc = load_json(STOPPED_PATH, {"stopped": []}, required=False)
+def parse_args(argv=None) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(
+        description="Move open long picks whose last completed daily close is at or below the stop."
+    )
+    ap.add_argument("--picks", type=Path, default=PICKS_PATH, help="picks.json (default: data/picks.json)")
+    ap.add_argument("--stopped", type=Path, default=STOPPED_PATH, help="stopped.json (default: data/stopped.json)")
+    ap.add_argument("--prices", type=Path, default=PRICES_PATH, help="prices.json (default: data/prices.json)")
+    ap.add_argument("--dry-run", action="store_true", help="report stop-outs but write nothing")
+    return ap.parse_args(argv)
+
+
+def main(argv=None, fetch=None, now: datetime | None = None) -> int:
+    args = parse_args(argv)
+    picks_path, stopped_path, prices_path = args.picks, args.stopped, args.prices
+    dry_run = args.dry_run
+
+    def write(path: Path, payload) -> None:
+        if dry_run:
+            print(f"(dry run: {path} not written)", file=sys.stderr)
+            return
+        write_json(path, payload)
+
+    picks_doc = load_json(picks_path, None, required=True)
+    stopped_doc = load_json(stopped_path, {"stopped": []}, required=False)
     if not isinstance(stopped_doc.get("stopped"), list):
         if "stopped" not in stopped_doc and isinstance(stopped_doc, dict) and not stopped_doc:
             stopped_doc = {"stopped": []}
         elif not isinstance(stopped_doc.get("stopped"), list):
             print('data/stopped.json must look like {"stopped": []}', file=sys.stderr)
             raise SystemExit(1)
-    prices_doc = load_json(PRICES_PATH, {"prices": {}, "updated": None}, required=False)
+    prices_doc = load_json(prices_path, {"prices": {}, "updated": None}, required=False)
 
     picks = picks_doc.get("picks")
     if not isinstance(picks, list):
         print('data/picks.json must look like {"picks": []}', file=sys.stderr)
         raise SystemExit(1)
 
-    session = last_completed_session_date()
+    session = last_completed_session_date(now)
     tickers: list[str] = []
     seen: set[str] = set()
     for pick in picks:
@@ -361,28 +410,29 @@ def main() -> int:
     if not tickers:
         print(f"No open long picks with a stop to check (session {session.isoformat()}).")
         print("STOPPED_TICKERS=")
-        if not STOPPED_PATH.exists():
-            write_json(STOPPED_PATH, {"stopped": []})
+        if not stopped_path.exists():
+            write(stopped_path, {"stopped": []})
         return 0
 
-    closes = collect_closes(tickers, session)
+    closes = collect_closes(tickers, session, fetch or fetch_daily_bars)
     new_picks, new_stopped, new_prices, moved = apply_stops(
         picks_doc, stopped_doc, closes, session, prices_doc, utc_now_iso()
     )
     if not moved:
         print(f"No stop-outs on close of {session.isoformat()}.")
         print("STOPPED_TICKERS=")
-        if not STOPPED_PATH.exists():
-            write_json(STOPPED_PATH, {"stopped": []})
+        if not stopped_path.exists():
+            write(stopped_path, {"stopped": []})
         return 0
 
-    write_json(PICKS_PATH, new_picks)
-    write_json(STOPPED_PATH, new_stopped)
-    write_json(PRICES_PATH, new_prices)
+    write(picks_path, new_picks)
+    write(stopped_path, new_stopped)
+    write(prices_path, new_prices)
     names = ", ".join(
         f"{rec['pick'].get('ticker')} @ {rec['closePrice']}" for rec in moved
     )
-    print(f"Stopped out {len(moved)} pick(s) on close of {session.isoformat()}: {names}")
+    verb = "DRY RUN: would stop out" if dry_run else "Stopped out"
+    print(f"{verb} {len(moved)} pick(s) on close of {session.isoformat()}: {names}")
     print("STOPPED_TICKERS=" + ",".join(str(rec["pick"].get("ticker") or "") for rec in moved))
     return 0
 
