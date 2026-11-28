@@ -704,6 +704,79 @@
         "stopAtr": 2.6,
         "size": "half"
       }
+    },
+    {
+      "id": "2026-11-28-AVNT",
+      "ticker": "AVNT",
+      "company": "Avient",
+      "dateCalled": "2026-11-28",
+      "calledAt": "2026-11-28T15:28:27.326Z",
+      "priceAtCall": 46.18,
+      "entryTrigger": 46.25,
+      "side": "long",
+      "type": "long",
+      "thesis": "Specialty materials compounder re-accelerating: organic sales growth 2%->3%->6%->10.6% over 4 quarters, EBITDA margin +80bp to 17.3%, adj EPS +23%, FY26 EPS guide raised; paying down debt ($100M YTD). Cheap at ~12.7x forward earnings in a Stage 2 uptrend. 1-3 year hold.",
+      "catalyst": "Raised FY26 adj EPS guide $3.22-3.32; Q4 report ~Feb 18, 2027",
+      "grade": "B",
+      "stop": 42.4,
+      "initialStop": 42.4,
+      "target": 56,
+      "targetBase": 56,
+      "targetBull": 75,
+      "timeframe": null,
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 2026: sales $891M +10.5% (organic +10.6%), adj EPS $0.86 +23% beat $0.80 guide, adj EBITDA margin 17.3% (+80bp)",
+          "sources": [
+            {
+              "title": "Avient Q3 2026 news release (SEC 8-K)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1122976/000112297626000145/avnt-20260930xnewsrelease.htm"
+            }
+          ]
+        },
+        {
+          "text": "FY26 adj EPS guide raised to $3.22-3.32 (from $3.10-3.25), 14-18% growth; $50M debt repaid in Q3, $100M YTD",
+          "sources": [
+            {
+              "title": "Avient Q3 2026 news release",
+              "url": "https://www.sec.gov/Archives/edgar/data/1122976/000112297626000145/avnt-20260930xnewsrelease.htm"
+            }
+          ]
+        },
+        {
+          "text": "Machine grade B (compounder 78/100): TT 7/7, revenue accelerating 4 qtrs, clean balance sheet; RS 71, A blocked on quality/profitability. Materials (XLB) is Stage 2 with positive RS vs SPY.",
+          "sources": []
+        },
+        {
+          "text": "Risk check: no S-1/S-3/424B/ATM filings in 90d (8-K, 10-Q, Form 3/4/144 only); no open-market insider buys or sales in 90d per Form 4 scan; net debt ~$1.4B vs ~$390M FCF (leverage is the main soft risk); float ~91M, avg vol ~765k = liquid; ~6% below 52w high, not extended (~9% over 50d); stop 42.40 under the Nov 21-24 lows (~42.65-42.96), ~2.8 ATR(1.36) below trigger; next earnings ~Feb 18, 2027. Half size (RED regime).",
+          "sources": [
+            {
+              "title": "SEC EDGAR filings index",
+              "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001122976&type=&dateb=&owner=include&count=40"
+            }
+          ]
+        }
+      ],
+      "baseTimeframe": "12 months",
+      "bullTimeframe": "2-3 years",
+      "bullCase": "organic growth holds high-single/low-double digits with margin expansion and deleveraging, re-rating toward a high-teens P/E on rising EPS",
+      "horizon": "swing",
+      "sector": "Basic Materials",
+      "vet": {
+        "decision": "PASS",
+        "checkedAt": "2026-11-28T15:28:28Z",
+        "rules": "2026-11-26",
+        "regime": "RED",
+        "stage": "Stage 2",
+        "peadException": false,
+        "atr14": 1.4914,
+        "stopAtr": 2.58,
+        "size": "half"
+      }
     }
   ]
 }
