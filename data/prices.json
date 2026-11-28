@@ -1,10 +1,10 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 0.36,
-      "prevClose": 75.63,
+      "changePct": 0.3,
+      "prevClose": 75.67,
       "price": 75.9,
-      "time": "2026-11-28T03:30:25Z"
+      "time": "2026-11-28T15:28:51Z"
     },
     "AFG": {
       "changePct": 0.19,
@@ -18,11 +18,23 @@
       "price": 184.43,
       "time": "2026-11-27T21:42:09Z"
     },
+    "AVNT": {
+      "changePct": 1.7,
+      "prevClose": 45.41,
+      "price": 46.18,
+      "time": "2026-11-28T15:28:51Z"
+    },
     "CARL": {
       "changePct": 5.8,
       "prevClose": 18.78,
       "price": 19.87,
       "time": "2026-11-27T21:42:09Z"
+    },
+    "EXLS": {
+      "changePct": 0.57,
+      "prevClose": 45.5,
+      "price": 45.76,
+      "time": "2026-11-28T15:28:51Z"
     },
     "FROG": {
       "changePct": 7.23,
@@ -49,5 +61,5 @@
       "time": "2026-11-27T21:42:09Z"
     }
   },
-  "updated": "2026-11-28T03:30:25Z"
+  "updated": "2026-11-28T15:28:51Z"
 }
