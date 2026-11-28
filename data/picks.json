@@ -631,6 +631,79 @@
         "stopAtr": 2.23,
         "size": "half"
       }
+    },
+    {
+      "id": "2026-11-28-EXLS",
+      "ticker": "EXLS",
+      "company": "ExlService Holdings",
+      "dateCalled": "2026-11-28",
+      "calledAt": "2026-11-28T15:28:22.216Z",
+      "priceAtCall": 45.76,
+      "entryTrigger": 45.8,
+      "side": "long",
+      "type": "long",
+      "thesis": "Data and AI services compounder accelerating: Q3 revenue +19.7% (4 straight quarters of acceleration 13%->14%->16%->20%), data/AI-led revenue (~2/3 of business) +36%, FY26 guidance raised again; breaking out to new 52-week highs with Trend Template 7/7 despite a weak tech tape. 1-3 year hold.",
+      "catalyst": "Raised FY26 guide (rev .43-2.44B, adj EPS .34-2.36); Q4 report ~Feb 23, 2027",
+      "grade": "B",
+      "stop": 42.6,
+      "initialStop": 42.6,
+      "target": 60,
+      "targetBase": 60,
+      "targetBull": 92,
+      "timeframe": null,
+      "status": "open",
+      "exitDate": null,
+      "exitPrice": null,
+      "notes": "",
+      "reasons": [
+        {
+          "text": "Q3 2026: revenue $634.0M +19.7% y/y, GAAP EPS +25.3%, adj EPS +28.5%; every segment grew 15%+ organically",
+          "sources": [
+            {
+              "title": "EXL Q3 2026 press release (SEC 8-K)",
+              "url": "https://www.sec.gov/Archives/edgar/data/1297989/000129798926000028/exlq326pressrelease.htm"
+            }
+          ]
+        },
+        {
+          "text": "Guidance raised a second time: FY26 revenue $2.430-2.440B (from $2.390-2.415B), adj EPS $2.34-2.36 (from $2.25-2.29)",
+          "sources": [
+            {
+              "title": "EXL Q3 2026 press release",
+              "url": "https://www.sec.gov/Archives/edgar/data/1297989/000129798926000028/exlq326pressrelease.htm"
+            }
+          ]
+        },
+        {
+          "text": "Machine grade A (compounder 90/100): TT 7/7, RS 81, revenue accelerating 4 qtrs, clean balance sheet; at a fresh 52-week high, 6m +61pp vs SPY. Downgraded to B for the risks below.",
+          "sources": []
+        },
+        {
+          "text": "Risk check: no S-1/S-3/424B/ATM filings in 90d (only 8-K, 10-Q, Form 4/144); heavy discretionary insider selling ~$11.7M by 4 sellers in 90d (soft risk); tech sector (XLK) is the weakest sector, below its 50/200d (soft risk); float ~146M, avg vol ~2.1M = liquid; up ~84% off 52w low but only ~15% above the 50d; stop 42.60 sits under the Nov 25-26 lows (~42.75-42.98), ~2.7 ATR(1.17) below trigger; next earnings ~Feb 23, 2027. 2 soft risks -> B, half size (RED regime).",
+          "sources": [
+            {
+              "title": "SEC EDGAR filings index",
+              "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001297989&type=&dateb=&owner=include&count=40"
+            }
+          ]
+        }
+      ],
+      "baseTimeframe": "12 months",
+      "bullTimeframe": "3 years",
+      "bullCase": "data/AI revenue keeps growing 30%+ and EPS compounds ~20%/yr, earning a premium multiple (stock roughly doubles)",
+      "horizon": "swing",
+      "sector": "Technology",
+      "vet": {
+        "decision": "PASS",
+        "checkedAt": "2026-11-28T15:28:23Z",
+        "rules": "2026-11-26",
+        "regime": "RED",
+        "stage": "Stage 2",
+        "peadException": false,
+        "atr14": 1.2311,
+        "stopAtr": 2.6,
+        "size": "half"
+      }
     }
   ]
 }
