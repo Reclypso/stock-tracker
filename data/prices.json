@@ -1,10 +1,10 @@
 {
   "prices": {
     "AAON": {
-      "changePct": 0.3,
-      "prevClose": 75.67,
+      "changePct": 0.36,
+      "prevClose": 75.63,
       "price": 75.9,
-      "time": "2026-11-27T21:42:09Z"
+      "time": "2026-11-28T03:30:25Z"
     },
     "AFG": {
       "changePct": 0.19,
@@ -49,5 +49,5 @@
       "time": "2026-11-27T21:42:09Z"
     }
   },
-  "updated": "2026-11-27T21:42:09Z"
+  "updated": "2026-11-28T03:30:25Z"
 }
