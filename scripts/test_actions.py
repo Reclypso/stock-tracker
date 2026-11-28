@@ -329,5 +329,225 @@ class CliTests(unittest.TestCase):
             self.assertEqual(code, 1, target)
 
 
+class ThesisFailedTests(unittest.TestCase):
+    def test_thesis_failed_flag_sells(self):
+        bars = mk(flat_then([10.2, 10.4, 10.3]))
+        p = pick_after(bars, 3, thesisFailed="FDA issued a CRL")
+        res = evaluate_pick(p, bars, WED)
+        self.assertEqual(kinds(res), ["SELL"])
+        self.assertEqual(res["actions"][0]["rule"], "thesis failed")
+        self.assertIn("FDA issued a CRL", res["actions"][0]["why"])
+        self.assertIn("--reason", res["actions"][0]["command"])
+
+    def test_event_outcome_negative_sells(self):
+        bars = mk(flat_then([10.2, 10.4]))
+        p = pick_after(bars, 2, eventOutcome="denied")
+        res = evaluate_pick(p, bars, WED)
+        self.assertEqual(res["actions"][0]["rule"], "thesis failed")
+
+    def test_thesis_failed_without_bars_uses_flag_basis(self):
+        p = {"id": "x", "ticker": "Q", "status": "open", "priceAtCall": 10.0, "stop": 9.0,
+             "type": "swing", "thesisFailed": "deal died"}
+        res = evaluate_pick(p, [], WED)
+        self.assertEqual(kinds(res), ["SELL"])
+        self.assertEqual(res["actions"][0]["basis"], "flag")
+
+
+class ApplyTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.base_dir = Path(self.tmp.name)
+        self.backup = self.base_dir / "backups"
+        self.picks = self.base_dir / "picks.json"
+        self.prices = self.base_dir / "prices.json"
+        self.stopped = self.base_dir / "stopped.json"
+        self.bars = self.base_dir / "bars.json"
+        self.out = self.base_dir / "out" / "actions.json"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def write(self, picks, bars_by, prices=None, stopped=None):
+        self.picks.write_text(json.dumps({"picks": picks}))
+        self.prices.write_text(json.dumps({"prices": prices or {p["ticker"]: {"price": 10} for p in picks if p.get("ticker")}}))
+        self.stopped.write_text(json.dumps({"stopped": stopped or []}))
+        payload = {
+            t: [[b.day.isoformat(), b.open, b.high, b.low, b.close, 0] for b in bars]
+            for t, bars in bars_by.items()
+        }
+        self.bars.write_text(json.dumps(payload))
+        self.snapshot = (self.picks.read_text(), self.prices.read_text(), self.stopped.read_text())
+
+    def argv(self, *extra):
+        return ["--picks", str(self.picks), "--prices", str(self.prices), "--stopped", str(self.stopped),
+                "--bars-json", str(self.bars), "--no-fetch", "--backup-dir", str(self.backup),
+                "--regime", str(self.base_dir / "none.json"), "--now", "2026-11-26T13:00:00Z", *extra]
+
+    def main(self, argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = actions.main(argv, fetch=lambda t: self.fail("must not fetch"))
+        return code, out.getvalue(), err.getvalue()
+
+    def test_apply_dry_run_is_default_safe(self):
+        bars = mk(flat_then([10.2, 9.4, 8.9]))
+        self.write([pick_after(bars, 3)], {"FAKE": bars})
+        code, out, err = self.main(self.argv("--apply", "--dry-run", "--out", str(self.out)))
+        self.assertEqual(code, 0)
+        self.assertIn("**SELL FAKE**", out)
+        self.assertIn("DRY RUN: would close FAKE", err)
+        self.assertFalse(self.out.exists())
+        self.assertEqual((self.picks.read_text(), self.prices.read_text(), self.stopped.read_text()), self.snapshot)
+        # Without --apply, tracker files stay put even though a SELL is listed.
+        code, _, _ = self.main(self.argv("--out", str(self.out)))
+        self.assertEqual(code, 0)
+        self.assertTrue(self.out.exists())
+        self.assertEqual((self.picks.read_text(), self.prices.read_text(), self.stopped.read_text()), self.snapshot)
+
+    def test_apply_moves_stop_out_to_stopped(self):
+        bars = mk(flat_then([10.2, 9.4, 8.9]))
+        p = pick_after(bars, 3)
+        self.write([p], {"FAKE": bars}, prices={"FAKE": {"price": 8.9}})
+        code, _, err = self.main(self.argv("--apply"))
+        self.assertEqual(code, 0, err)
+        doc = json.loads(self.picks.read_text())
+        self.assertEqual(doc["picks"], [])
+        stopped = json.loads(self.stopped.read_text())["stopped"]
+        self.assertEqual(len(stopped), 1)
+        self.assertEqual(stopped[0]["pick"]["ticker"], "FAKE")
+        self.assertEqual(stopped[0]["pick"]["status"], "closed")
+        self.assertEqual(stopped[0]["closePrice"], 8.9)
+        self.assertIn("stop", stopped[0]["reason"])
+        prices = json.loads(self.prices.read_text())
+        self.assertNotIn("FAKE", prices.get("prices", {}))
+        self.assertIn("Applied close FAKE", err)
+        # Backup of the original picks exists and is valid.
+        backups = list(self.backup.glob("picks.json.*"))
+        self.assertTrue(backups)
+        self.assertEqual(json.loads(backups[0].read_text())["picks"][0]["ticker"], "FAKE")
+
+    def test_apply_closes_time_exit_in_picks(self):
+        # 16 sessions, never a new high above entry: TIME EXIT, stays in picks.json closed.
+        bars = mk([10.0] * 17)
+        p = pick_after(bars, 16)
+        self.write([p], {"FAKE": bars})
+        code, out, err = self.main(self.argv("--apply"))
+        self.assertEqual(code, 0, err)
+        self.assertIn("TIME EXIT", out)
+        doc = json.loads(self.picks.read_text())
+        self.assertEqual(len(doc["picks"]), 1)
+        closed = doc["picks"][0]
+        self.assertEqual(closed["status"], "closed")
+        self.assertEqual(closed["exitPrice"], 10.0)
+        self.assertTrue(closed["exitReason"].startswith("15 sessions"))
+        self.assertEqual(json.loads(self.stopped.read_text())["stopped"], [])
+
+    def test_apply_skips_quote_sell_and_trim(self):
+        # Quote-only stop: SELL is listed but not applied (need the official close).
+        quote_pick = {"id": "q-1", "ticker": "QUOT", "status": "open", "priceAtCall": 10.0,
+                      "stop": 9.0, "type": "swing", "dateCalled": "2026-11-20",
+                      "calledAt": "2026-11-20T22:00:00Z"}
+        trim_bars = mk(flat_then([10.5, 11.2, 11.9, 12.5]))
+        trim_pick = pick_after(trim_bars, 4, ticker="TRIM", id="2026-11-20-TRIM")
+        self.write([quote_pick, trim_pick], {"TRIM": trim_bars},
+                   prices={"QUOT": {"price": 8.8}, "TRIM": {"price": 12.5}})
+        before = (self.picks.read_text(), self.prices.read_text(), self.stopped.read_text())
+        code, out, err = self.main(self.argv("--apply"))
+        self.assertEqual(code, 0, err)
+        self.assertIn("SELL QUOT", out)
+        self.assertIn("TRIM", out)
+        self.assertIn("no SELL/TIME EXIT closes", err)
+        self.assertEqual((self.picks.read_text(), self.prices.read_text(), self.stopped.read_text()), before)
+
+    def test_apply_invalidate_and_already_closed(self):
+        bars = mk(flat_then([10.2, 10.4, 10.3]))
+        open_p = pick_after(bars, 3, ticker="LIVE", id="2026-11-20-LIVE")
+        done = dict(pick_after(bars, 3, ticker="DEAD", id="2026-11-20-DEAD"), status="closed", exitPrice=9, exitDate="2026-11-24")
+        self.write([open_p, done], {"LIVE": bars, "DEAD": bars})
+        code, _, err = self.main(self.argv("--apply", "--invalidate", "LIVE=FDA CRL"))
+        self.assertEqual(code, 0, err)
+        doc = json.loads(self.picks.read_text())
+        by_id = {p["id"]: p for p in doc["picks"]}
+        self.assertEqual(by_id["2026-11-20-LIVE"]["status"], "closed")
+        self.assertIn("FDA CRL", by_id["2026-11-20-LIVE"]["exitReason"])
+        self.assertEqual(by_id["2026-11-20-DEAD"]["exitPrice"], 9)  # untouched
+        self.assertEqual(json.loads(self.stopped.read_text())["stopped"], [])
+
+    def test_pure_apply_closes_is_idempotent(self):
+        bars = mk(flat_then([10.2, 9.4, 8.9]))
+        p = pick_after(bars, 3)
+        res = evaluate_pick(p, bars, WED)
+        picks_doc, stopped_doc, _, applied = actions.apply_closes(
+            {"picks": [p]}, {"stopped": []}, {"prices": {"FAKE": {"price": 8.9}}}, res["actions"]
+        )
+        self.assertEqual(len(applied), 1)
+        self.assertEqual(picks_doc["picks"], [])
+        # Running again against the already-moved result applies nothing.
+        _, _, _, applied2 = actions.apply_closes(picks_doc, stopped_doc, {"prices": {}}, res["actions"])
+        self.assertEqual(applied2, [])
+
+
+class PickCliCloseTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.picks = self.dir / "picks.json"
+        self.stopped = self.dir / "stopped.json"
+        self.prices = self.dir / "prices.json"
+        pick = {"id": "2026-11-20-FAKE", "ticker": "FAKE", "status": "open", "grade": "B",
+                "dateCalled": "2026-11-20", "priceAtCall": 10.0, "stop": 9.0, "thesis": "Medium-term: x"}
+        self.picks.write_text(json.dumps({"picks": [pick]}, indent=2) + "\n")
+        self.stopped.write_text(json.dumps({"stopped": []}, indent=2) + "\n")
+        self.prices.write_text(json.dumps({"prices": {"FAKE": {"price": 8.5}}, "updated": "x"}, indent=2) + "\n")
+        self.script = Path(__file__).resolve().parent / "pick.mjs"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_cli(self, args):
+        import subprocess
+        env = dict(**{k: v for k, v in __import__("os").environ.items() if k != "STOCKBOT_BACKUP_DIR"})
+        env["STOCKBOT_BACKUP_DIR"] = str(self.dir / "backups")
+        res = subprocess.run(["node", str(self.script), *args], capture_output=True, text=True)
+        return res.returncode, res.stdout, res.stderr
+
+    def test_close_by_ticker_dry_run_and_apply(self):
+        code, out, err = self.run_cli([
+            "close", "FAKE", "--exit-price", "8.50", "--reason", "stop",
+            "--date", "2026-11-25", "--to-stopped", "--dry-run",
+            "--picks", str(self.picks), "--stopped", str(self.stopped), "--prices", str(self.prices),
+        ])
+        self.assertEqual(code, 0, err)
+        self.assertIn("DRY RUN", out)
+        self.assertEqual(json.loads(self.picks.read_text())["picks"][0]["status"], "open")
+
+        code, out, err = self.run_cli([
+            "close", "FAKE", "--exit-price", "8.50", "--reason", "stop",
+            "--date", "2026-11-25", "--to-stopped",
+            "--picks", str(self.picks), "--stopped", str(self.stopped), "--prices", str(self.prices),
+        ])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(self.picks.read_text())["picks"], [])
+        stopped = json.loads(self.stopped.read_text())["stopped"]
+        self.assertEqual(stopped[0]["pick"]["ticker"], "FAKE")
+        self.assertEqual(stopped[0]["pick"]["exitReason"], "stop")
+        self.assertEqual(stopped[0]["closePrice"], 8.5)
+        self.assertNotIn("FAKE", json.loads(self.prices.read_text())["prices"])
+
+    def test_close_without_to_stopped_keeps_closed_card(self):
+        code, _, err = self.run_cli([
+            "close", "--id", "2026-11-20-FAKE", "--exit-price", "11.00",
+            "--reason", "time exit", "--date", "2026-11-25",
+            "--picks", str(self.picks),
+        ])
+        self.assertEqual(code, 0, err)
+        pick = json.loads(self.picks.read_text())["picks"][0]
+        self.assertEqual(pick["status"], "closed")
+        self.assertEqual(pick["exitPrice"], 11)
+        self.assertEqual(pick["exitDate"], "2026-11-25")
+        self.assertEqual(pick["exitReason"], "time exit")
+        self.assertEqual(json.loads(self.stopped.read_text())["stopped"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

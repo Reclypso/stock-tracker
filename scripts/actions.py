@@ -3,13 +3,24 @@
 
     python3 scripts/actions.py --picks /tmp/copy/picks.json --prices /tmp/copy/prices.json \
         --out /tmp/actions.json [--md /tmp/actions.md] [--regime ../gates/regime.json] \
-        [--bars-json bars.json | --no-fetch] [--dry-run] [--json]
+        [--bars-json bars.json | --no-fetch] [--dry-run] [--json] [--apply] \
+        [--invalidate TICKER=reason] [--stopped /tmp/copy/stopped.json]
 
-Read-only on tracker data. It writes only --out / --md, refuses to write over
-picks.json / stopped.json / prices.json, and writes nothing with --dry-run (or
-without --out). The markdown block is printed to stdout for the briefing.
-Stops are never changed here: RAISE STOP lines carry the `pick.mjs update`
-command to apply them.
+Default is report-only: it writes only --out / --md, refuses to write those
+over picks.json / stopped.json / prices.json, and writes nothing with
+--dry-run (or without --out). The markdown block is printed to stdout for
+the briefing. TRIM and RAISE STOP stay advisories (RAISE STOP lines carry
+the `pick.mjs update` command).
+
+`--apply` auto-closes clear "call fell through" cases (SELL and TIME EXIT
+on an official close or a thesis-failed flag — never a quote-only SELL)
+through the same close/stop path as `pick.mjs close`. Stop-rule SELLs are
+moved to stopped.json (like check_stops.py). Other closes stay in
+picks.json with status=closed, exitDate, exitPrice, and exitReason.
+`--dry-run` (the safe default for testing) reports what would close and
+writes nothing to the tracker. Scan routines must pass `--apply`. Backups
+go to /tmp/stock-tracker-backups; writes are atomic (temp + rename) after
+JSON validation.
 
 Daily bars come from yfinance (no key, ~1 year), only completed sessions up to
 the last US close, and only closes after the pick was called count toward
@@ -56,6 +67,7 @@ actions.json schema ("stock-bot/actions@1"):
 from __future__ import annotations
 
 import argparse
+import subprocess
 import json
 import math
 import sys
@@ -74,6 +86,8 @@ from check_stops import (  # noqa: E402
     ineligible_session_date,
     is_open_status,
     last_completed_session_date,
+    prune_prices,
+    return_pct,
     side_of,
     usable_number,
     utc_now_iso,
@@ -200,6 +214,20 @@ def trimmed(pick: dict) -> bool:
     return any(usable_number((p or {}).get("fraction")) for p in parts if isinstance(p, dict))
 
 
+def thesis_invalidation(pick: dict) -> str | None:
+    """Human/routine flag that the thesis or catalyst has failed."""
+    for key in ("thesisFailed", "catalystFailed"):
+        raw = pick.get(key)
+        if raw is True:
+            return "thesis marked failed"
+        if isinstance(raw, str) and raw.strip():
+            return raw.strip()
+    outcome = str(pick.get("eventOutcome") or "").strip().lower()
+    if outcome in {"failed", "negative", "denied", "crl", "rejected"}:
+        return f"eventOutcome={outcome}"
+    return None
+
+
 # ---------------------------------------------------------------- engine
 
 
@@ -239,7 +267,13 @@ def evaluate_pick(
              "entry": px(entry), "stop": px(stop), "basis": basis}
         a.update({k: v for k, v in extra.items() if v is not None})
         if kind in ("SELL", "TIME EXIT"):
-            a["command"] = f'node scripts/pick.mjs close --id {pid} --price <fill> --notes "{rule}"'
+            price = px(close) or "<fill>"
+            date_flag = f" --date {pos['closeDate']}" if pos.get("closeDate") else ""
+            stopped_flag = " --to-stopped" if rule == "stop" else ""
+            a["command"] = (
+                f'node scripts/pick.mjs close --id {pid} --exit-price {price} '
+                f'--reason "{rule}"{date_flag}{stopped_flag} --no-push'
+            )
         elif kind == "TRIM":
             a["command"] = f'node scripts/pick.mjs update --id {pid} --partial "{extra["fraction"]}@<fill>"'
         elif kind == "RAISE STOP":
@@ -251,6 +285,24 @@ def evaluate_pick(
         pos["actions"] = [a["action"] for a in actions]
         pos["notes"] = notes
         return {"actions": actions, "position": pos, "skipped": skipped}
+
+    failed = thesis_invalidation(pick)
+    if failed:
+        if eligible:
+            last = eligible[-1]
+            pos["close"] = px(last.close)
+            pos["closeDate"] = last.day.isoformat()
+            close_px, basis = last.close, "close"
+        elif quote is not None:
+            pos["close"] = px(quote)
+            close_px, basis = quote, "flag"
+        else:
+            close_px, basis = entry, "flag"
+        if close_px is not None:
+            act("SELL", "thesis failed", f"thesis invalidated: {failed}", close=close_px, basis=basis)
+            return finish()
+        skipped.append(f"thesis failed ({failed}) but no price to close at")
+        return finish()
 
     if entry is None:
         skipped.append("no usable entry price")
@@ -555,23 +607,296 @@ def load_doc(path: Path, key: str) -> dict:
     return doc if isinstance(doc, dict) else {}
 
 
+CLOSE_ACTIONS = frozenset({"SELL", "TIME EXIT"})
+BACKUP_DIR = Path("/tmp/stock-tracker-backups")
+
+
+def parse_invalidate(items: list[str] | None) -> dict[str, str]:
+    """Parse --invalidate TICKER=reason (repeatable) into {TICKER: reason}."""
+    out: dict[str, str] = {}
+    for raw in items or []:
+        text = str(raw).strip()
+        if not text:
+            raise ValueError("empty --invalidate")
+        if "=" in text:
+            tick, reason = text.split("=", 1)
+        elif ":" in text:
+            tick, reason = text.split(":", 1)
+        else:
+            tick, reason = text, "thesis invalidated"
+        tick = tick.strip().upper()
+        reason = reason.strip() or "thesis invalidated"
+        if not tick:
+            raise ValueError(f"invalid --invalidate {raw!r}")
+        out[tick] = reason
+    return out
+
+
+def apply_invalidations(picks: list[dict], flags: dict[str, str]) -> list[dict]:
+    """Return a shallow-copied pick list with thesisFailed set from --invalidate."""
+    if not flags:
+        return picks
+    out = []
+    for pick in picks:
+        if not isinstance(pick, dict):
+            out.append(pick)
+            continue
+        tick = str(pick.get("ticker") or "").upper().strip()
+        if tick in flags and is_open_status(pick):
+            copy = dict(pick)
+            copy["thesisFailed"] = flags[tick]
+            out.append(copy)
+        else:
+            out.append(pick)
+    return out
+
+
+def is_auto_close(action: dict) -> bool:
+    """Official-close (or thesis-flag) SELL / TIME EXIT. Quote-only SELL is not applied."""
+    if action.get("action") not in CLOSE_ACTIONS:
+        return False
+    if action.get("basis") == "quote":
+        return False
+    return True
+
+
+def closeable_actions(actions: list[dict]) -> list[dict]:
+    """One auto-close per pick id, keeping the first (highest priority) action."""
+    seen: set[str] = set()
+    out: list[dict] = []
+    for action in actions:
+        if not is_auto_close(action):
+            continue
+        pid = str(action.get("id") or "")
+        if not pid or pid in seen:
+            continue
+        seen.add(pid)
+        out.append(action)
+    return out
+
+
+def _validate_payload(path: Path, payload: dict, key: str) -> None:
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path} must be a JSON object")
+    value = payload.get(key)
+    if key == "prices":
+        if value is None:
+            payload["prices"] = {}
+        elif not isinstance(value, dict):
+            raise ValueError(f"{path} must look like {{\"prices\": {{}}}}")
+        return
+    if not isinstance(value, list):
+        raise ValueError(f"{path} must be a JSON object with a {key!r} array")
+
+
+def atomic_write_json(path: Path, payload: dict, *, key: str, backup_dir: Path = BACKUP_DIR) -> Path | None:
+    """Backup (if the file exists), write to a temp file, validate, then replace."""
+    _validate_payload(path, payload, key)
+    text = json.dumps(payload, indent=2) + "\n"
+    json.loads(text)  # validate serialization
+    backup_path = None
+    if path.exists():
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        backup_path = backup_dir / f"{path.name}.{stamp}"
+        backup_path.write_bytes(path.read_bytes())
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    try:
+        check = json.loads(tmp.read_text(encoding="utf-8"))
+        _validate_payload(tmp, check, key)
+    except Exception:
+        tmp.unlink(missing_ok=True)
+        raise
+    tmp.replace(path)
+    return backup_path
+
+
+def apply_closes(
+    picks_doc: dict,
+    stopped_doc: dict,
+    prices_doc: dict | None,
+    actions: list[dict],
+    *,
+    now_iso: str | None = None,
+) -> tuple[dict, dict, dict, list[dict]]:
+    """Apply auto-close actions to copies of the tracker docs. Pure; no I/O.
+
+    Stop-rule SELLs are moved to stopped.json (same shape as check_stops.py).
+    Other SELL / TIME EXIT actions stay in picks.json with status=closed,
+    exitDate, exitPrice, and exitReason. Already-closed or missing picks are
+    skipped. Quote-based actions must not be passed in (use closeable_actions).
+    """
+    picks = list(picks_doc.get("picks") or [])
+    if not isinstance(picks_doc.get("picks"), list):
+        raise ValueError('picks.json must look like {"picks": []}')
+    stopped_list = list((stopped_doc or {}).get("stopped") or [])
+    if stopped_doc and "stopped" in stopped_doc and not isinstance(stopped_doc.get("stopped"), list):
+        raise ValueError('stopped.json must look like {"stopped": []}')
+
+    applied: list[dict] = []
+    live: dict[str, dict] = {
+        str(p.get("id") or ""): dict(p)
+        for p in picks
+        if isinstance(p, dict) and p.get("id")
+    }
+    removed: set[str] = set()
+
+    for action in closeable_actions(actions):
+        pid = str(action.get("id") or "")
+        pick = live.get(pid)
+        if not pick or pid in removed or not is_open_status(pick):
+            continue
+        exit_price = usable_number(action.get("close"))
+        if exit_price is None:
+            continue
+        exit_date = (
+            str(action.get("closeDate") or "").strip()
+            or str(action.get("date") or "").strip()
+            or datetime.now(timezone.utc).date().isoformat()
+        )
+        reason = str(action.get("rule") or action.get("action") or "close").strip()
+        why = str(action.get("why") or "").strip()
+        pick["status"] = "closed"
+        pick["exitPrice"] = px(exit_price)
+        pick["exitDate"] = exit_date
+        pick["exitReason"] = reason if not why else f"{reason}: {why}"
+        to_stopped = reason == "stop"
+        record = {
+            "id": pid,
+            "ticker": str(pick.get("ticker") or action.get("ticker") or ""),
+            "action": action.get("action"),
+            "rule": reason,
+            "why": why,
+            "exitPrice": pick["exitPrice"],
+            "exitDate": exit_date,
+            "toStopped": to_stopped,
+        }
+        if to_stopped:
+            stopped_list.insert(0, {
+                "stoppedDate": exit_date,
+                "closePrice": pick["exitPrice"],
+                "returnPct": return_pct(pick.get("priceAtCall"), exit_price),
+                "reason": pick["exitReason"],
+                "pick": pick,
+            })
+            removed.add(pid)
+        applied.append(record)
+
+    new_picks = []
+    for original in picks:
+        if not isinstance(original, dict) or not original.get("id"):
+            new_picks.append(original)
+            continue
+        pid = str(original.get("id"))
+        if pid in removed:
+            continue
+        new_picks.append(live.get(pid, original))
+
+    open_tickers = {
+        str(p.get("ticker") or "").upper().strip()
+        for p in new_picks
+        if isinstance(p, dict) and is_open_status(p) and p.get("ticker")
+    }
+    new_prices = prune_prices(prices_doc or {}, open_tickers, now_iso or utc_now_iso())
+    return {"picks": new_picks}, {"stopped": stopped_list}, new_prices, applied
+
+
+def render_apply(applied: list[dict], *, dry_run: bool) -> str:
+    if not applied:
+        return "APPLY: no SELL/TIME EXIT closes to apply." if not dry_run else "DRY RUN: no SELL/TIME EXIT closes would be applied."
+    verb = "DRY RUN: would close" if dry_run else "Applied close"
+    lines = []
+    for rec in applied:
+        where = "stopped.json" if rec.get("toStopped") else "picks.json (closed)"
+        lines.append(
+            f"{verb} {rec.get('ticker')} ({rec.get('id')}) @ {rec.get('exitPrice')} "
+            f"on {rec.get('exitDate')} [{rec.get('rule')}] -> {where}"
+        )
+    return "\n".join(lines)
+
+
+
+def publish_tracker(message: str, files: list[Path]) -> int:
+    """One commit + push of the applied data files. Never force-pushes.
+
+    Only called for official live-tracker paths after a successful --apply.
+    `git pull --rebase --autostash` first; skip the commit if there is no diff.
+    """
+    repo = ROOT
+
+    def git(*argv: str):
+        return subprocess.run(["git", *argv], cwd=repo, capture_output=True, text=True)
+
+    pull = git("pull", "--rebase", "--autostash")
+    if pull.returncode != 0:
+        print(f"git pull --rebase failed (files were written): {pull.stderr.strip()}", file=sys.stderr)
+        return 1
+    rel = []
+    for path in files:
+        try:
+            rel.append(str(path.resolve().relative_to(repo.resolve())))
+        except ValueError:
+            print(f"refusing to git-add {path}: not inside the tracker repo", file=sys.stderr)
+            return 1
+    add = git("add", "--", *rel)
+    if add.returncode != 0:
+        print(f"git add failed: {add.stderr.strip()}", file=sys.stderr)
+        return 1
+    staged = git("diff", "--cached", "--quiet")
+    if staged.returncode == 0:
+        print("git: nothing new to commit", file=sys.stderr)
+        return 0
+    if staged.returncode != 1:
+        print("git diff --cached failed", file=sys.stderr)
+        return 1
+    commit = git("commit", "-m", message)
+    if commit.returncode != 0:
+        print(f"git commit failed: {commit.stderr.strip()}", file=sys.stderr)
+        return 1
+    push = git("push")
+    if push.returncode != 0:
+        print(f"git push failed (commit is local): {push.stderr.strip()}", file=sys.stderr)
+        return 1
+    print(f"published: {message}", file=sys.stderr)
+    return 0
+
+
 def parse_args(argv=None):
-    ap = argparse.ArgumentParser(description="Build the 5 AM exit-actions list (read-only on tracker data).")
-    ap.add_argument("--picks", type=Path, default=PICKS_PATH, help="picks.json to read")
-    ap.add_argument("--prices", type=Path, default=PRICES_PATH, help="prices.json to read (quotes fallback)")
+    ap = argparse.ArgumentParser(
+        description="Build the 5 AM exit-actions list; with --apply, auto-close fallen-through picks."
+    )
+    ap.add_argument("--picks", type=Path, default=PICKS_PATH, help="picks.json to read (and write with --apply)")
+    ap.add_argument("--prices", type=Path, default=PRICES_PATH, help="prices.json to read (quotes fallback; pruned on stop-out)")
+    ap.add_argument("--stopped", type=Path, default=STOPPED_PATH, help="stopped.json (written for stop-rule closes with --apply)")
     ap.add_argument("--out", type=Path, help="write actions.json here (omit = print only)")
     ap.add_argument("--md", type=Path, help="also write the markdown block here")
     ap.add_argument("--regime", type=Path, default=DEFAULT_REGIME, help="gates/regime.json (optional)")
     ap.add_argument("--bars-json", type=Path, help='offline bars {"TICKER": [[date,o,h,l,c,v],...]}')
     ap.add_argument("--no-fetch", action="store_true", help="no yfinance: use --bars-json and/or quotes")
     ap.add_argument("--now", help="ISO timestamp to evaluate as of (default: now)")
-    ap.add_argument("--dry-run", action="store_true", help="print only; write nothing")
+    ap.add_argument("--dry-run", action="store_true", help="print only; write nothing (safe default for testing closes)")
+    ap.add_argument("--apply", action="store_true",
+                    help="auto-close SELL/TIME EXIT (stop, time exit, event passed, thesis failed). Routines must pass this.")
+    ap.add_argument("--invalidate", action="append", default=[], metavar="TICKER=reason",
+                    help="treat TICKER as thesis-failed for this run (repeatable)")
+    ap.add_argument("--backup-dir", type=Path, default=BACKUP_DIR, help="where to write pre-apply backups")
+    ap.add_argument("--no-push", action="store_true",
+                    help="with --apply on the live tracker, write files but do not git commit/push")
     ap.add_argument("--json", action="store_true", help="print the JSON document instead of markdown")
     return ap.parse_args(argv)
 
 
 def main(argv=None, fetch=fetch_bars) -> int:
     args = parse_args(argv)
+    # If --picks points at a copy, do not fall back to the live stopped/prices
+    # files when those flags were left at their repo defaults.
+    if args.picks.resolve() != PICKS_PATH.resolve():
+        if args.stopped.resolve() == STOPPED_PATH.resolve():
+            args.stopped = args.picks.parent / "stopped.json"
+        if args.prices.resolve() == PRICES_PATH.resolve():
+            args.prices = args.picks.parent / "prices.json"
     for target in (args.out, args.md):
         if target is not None:
             resolved = target.resolve()
@@ -585,15 +910,30 @@ def main(argv=None, fetch=fetch_bars) -> int:
             now = now.replace(tzinfo=timezone.utc)
     session = last_completed_session_date(now)
 
-    picks = load_doc(args.picks, "picks").get("picks")
+    try:
+        invalidate = parse_invalidate(args.invalidate)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    picks_doc = load_doc(args.picks, "picks")
+    picks = picks_doc.get("picks")
     if not isinstance(picks, list):
         print(f'{args.picks} must look like {{"picks": []}}', file=sys.stderr)
         return 1
-    prices = load_doc(args.prices, "prices").get("prices") or {}
+    picks = apply_invalidations(picks, invalidate)
+    prices_doc = load_doc(args.prices, "prices")
+    prices = prices_doc.get("prices") or {}
     quotes = {str(k).upper(): usable_number((v or {}).get("price")) for k, v in prices.items() if isinstance(v, dict)}
     quotes = {k: v for k, v in quotes.items() if v is not None}
     regime_doc = load_doc(args.regime, "regime") if args.regime else {}
     regime_color = str(regime_doc.get("color") or "").upper() or None
+    stopped_doc = load_doc(args.stopped, "stopped") if args.stopped else {}
+    if stopped_doc and "stopped" in stopped_doc and not isinstance(stopped_doc.get("stopped"), list):
+        print(f'{args.stopped} must look like {{"stopped": []}}', file=sys.stderr)
+        return 1
+    if not stopped_doc:
+        stopped_doc = {"stopped": []}
 
     tickers = sorted({
         str(p.get("ticker") or "").upper().strip()
@@ -616,20 +956,62 @@ def main(argv=None, fetch=fetch_bars) -> int:
                 bars_by[t] = []
 
     doc = build_actions(picks, bars_by, session, quotes=quotes, regime_color=regime_color, fetch_errors=errors)
+    applied: list[dict] = []
+    apply_note = ""
+    if args.apply or any(is_auto_close(a) for a in doc["actions"]) or invalidate:
+        # Always compute what --apply would do, so a dry run can report it.
+        new_picks, new_stopped, new_prices, applied = apply_closes(
+            {"picks": picks}, stopped_doc, prices_doc, doc["actions"], now_iso=doc["generatedAt"]
+        )
+        would = not (args.apply and not args.dry_run)
+        apply_note = render_apply(applied, dry_run=would)
+        doc["applied"] = applied
+        doc["applyDryRun"] = would
+        if args.apply or applied:
+            print(apply_note, file=sys.stderr)
+
     if args.json:
         print(json.dumps(doc, indent=2))
     else:
         print(doc["markdown"])
-    if args.dry_run or args.out is None:
-        if args.out is not None or args.md is not None:
+
+    write_out = bool(args.out) and not args.dry_run
+    write_tracker = bool(args.apply) and not args.dry_run and bool(applied)
+    if args.dry_run:
+        if args.out is not None or args.md is not None or args.apply:
             print("(dry run: nothing written)", file=sys.stderr)
         return 0
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
-    if args.md:
-        args.md.parent.mkdir(parents=True, exist_ok=True)
-        args.md.write_text(doc["markdown"] + "\n", encoding="utf-8")
-    print(f"wrote {args.out}" + (f" and {args.md}" if args.md else ""), file=sys.stderr)
+
+    if write_tracker:
+        try:
+            atomic_write_json(args.picks, new_picks, key="picks", backup_dir=args.backup_dir)
+            atomic_write_json(args.prices, new_prices, key="prices", backup_dir=args.backup_dir)
+            if any(r.get("toStopped") for r in applied):
+                atomic_write_json(args.stopped, new_stopped, key="stopped", backup_dir=args.backup_dir)
+        except Exception as exc:
+            print(f"APPLY failed, tracker files left unchanged: {exc}", file=sys.stderr)
+            return 1
+        wrote_paths = [args.picks, args.prices]
+        if any(r.get("toStopped") for r in applied):
+            wrote_paths.append(args.stopped)
+        print("wrote " + ", ".join(str(p) for p in wrote_paths), file=sys.stderr)
+        live = args.picks.resolve() == PICKS_PATH.resolve()
+        if live and not args.no_push:
+            names = ", ".join(r.get("ticker") or r.get("id") or "?" for r in applied)
+            msg = f"Close {len(applied)} pick(s): {names}"
+            pub = publish_tracker(msg, wrote_paths)
+            if pub != 0:
+                return pub
+        elif live:
+            print("( --no-push: written, not committed )", file=sys.stderr)
+
+    if write_out:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+        if args.md:
+            args.md.parent.mkdir(parents=True, exist_ok=True)
+            args.md.write_text(doc["markdown"] + "\n", encoding="utf-8")
+        print(f"wrote {args.out}" + (f" and {args.md}" if args.md else ""), file=sys.stderr)
     return 0
 
 

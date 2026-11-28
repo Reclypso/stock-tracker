@@ -129,7 +129,8 @@ node scripts/pick.mjs add-reason --id 2026-11-09-IONQ --reason "Customer logo" -
 ### Close
 
 ```bash
-node scripts/pick.mjs close --id 2026-11-09-IONQ --price 72.50 --notes "Base target cleared"
+node scripts/pick.mjs close --id 2026-11-09-IONQ --exit-price 72.50 --reason "time exit"
+# or: node scripts/pick.mjs close IONQ --exit-price 72.50 --reason "stop" --to-stopped
 ```
 
 `--date` defaults to today in America/Los_Angeles. This sets `status` to `closed`, plus `exitPrice` and `exitDate`.
